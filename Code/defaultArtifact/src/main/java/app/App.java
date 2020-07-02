@@ -59,7 +59,7 @@ public class App extends Application {
         runFullAlgButton.setPrefHeight(35.0);
         runFullAlgButton.setVisible(false);
 
-        Button reRunAlgButton = new Button("Re run"); //Firsov's button
+        Button reRunAlgButton = new Button("Re run");
         reRunAlgButton.setLayoutX(790.0);
         reRunAlgButton.setLayoutY(65.0);
         reRunAlgButton.setPrefWidth(70.0);
@@ -135,7 +135,7 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String str = editLogger.getText() + "\nRun full shit";
+                String str = editLogger.getText() + "\nRun full";
                 editLogger.setText(str);
             }
         });
@@ -143,7 +143,7 @@ public class App extends Application {
         reRunAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String str = editLogger.getText() + "\nRe run full shit";
+                String str = editLogger.getText() + "\nRe run full";
                 editLogger.setText(str);
             }
         });
