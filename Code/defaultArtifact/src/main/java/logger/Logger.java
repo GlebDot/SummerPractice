@@ -7,4 +7,9 @@ public class Logger implements ILogger {
     public void logEvent(AlgorithmMessage message) {
         //realisation here
     }
+
+    @Override
+    public void clear() {
+        
+    }
 }
