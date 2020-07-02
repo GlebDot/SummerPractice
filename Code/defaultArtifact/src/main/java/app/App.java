@@ -17,12 +17,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        Button commonEditButton = new Button("Edit graph"); //edit graph via mouse
-        commonEditButton.setLayoutX(50.0);
-        commonEditButton.setLayoutY(50.0);
-        commonEditButton.setPrefWidth(100.0);
-        commonEditButton.setPrefHeight(50.0);
-
         Button fileEditButton = new Button("File input"); //upload graph from file
         fileEditButton.setLayoutX(170.0);
         fileEditButton.setLayoutY(50.0);
@@ -36,7 +30,7 @@ public class App extends Application {
         clearGraphButton.setPrefHeight(50.0);
 
         Button onWatchModeButton = new Button("Watch"); //change mode to watch (and back to edit)
-        onWatchModeButton.setLayoutX(410.0);
+        onWatchModeButton.setLayoutX(50.0);
         onWatchModeButton.setLayoutY(50.0);
         onWatchModeButton.setPrefWidth(100.0);
         onWatchModeButton.setPrefHeight(50.0);
@@ -69,14 +63,6 @@ public class App extends Application {
         editLogger.setLayoutY(120.0);
 
         //handlers
-        commonEditButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String str = editLogger.getText() + "\nDefolt edit pressed";
-                editLogger.setText(str);
-            }
-        });
-
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -99,7 +85,6 @@ public class App extends Application {
                 if(onWatchModeButton.getText() == "Watch"){
                     String str = "Algorithm Logger:";
                     editLogger.setText(str);
-                    commonEditButton.setDisable(true);
                     fileEditButton.setDisable(true);
                     clearGraphButton.setDisable(true);
                     onWatchModeButton.setText("Back to edit");
@@ -109,7 +94,6 @@ public class App extends Application {
                 }
                 else{
                     editLogger.setText("Edit Logger:");
-                    commonEditButton.setDisable(false);
                     fileEditButton.setDisable(false);
                     clearGraphButton.setDisable(false);
                     onWatchModeButton.setText("Watch");
@@ -144,7 +128,7 @@ public class App extends Application {
             }
         });
 
-        Group root = new Group(commonEditButton, editLogger, fileEditButton, clearGraphButton, onWatchModeButton,
+        Group root = new Group(editLogger, fileEditButton, clearGraphButton, onWatchModeButton,
                 makeAlgStepButton, runFullAlgButton, reRunAlgButton);
         Scene scene = new Scene(root);
 
