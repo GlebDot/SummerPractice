@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 
@@ -19,7 +20,7 @@ public class App extends Application {
     //Var logger 
     //Var GraphEditor
     //Vars...
-      
+
     @Override
     public void start(Stage stage) {
         
@@ -82,6 +83,9 @@ public class App extends Application {
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open Resource File");
+                fileChooser.showOpenDialog(stage);
                 String str = editLogger.getText() + "\nInput edit pressed";
                 editLogger.setText(str);
             }
