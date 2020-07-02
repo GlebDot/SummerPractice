@@ -17,4 +17,15 @@ public class Graph implements IGraph {
     public void addEdge(Edge e) {
 
     }
+
+
+    @Override
+    public void deleteEdge(Edge e) {
+
+    }
+
+    @Override
+    public void deleteVertex(Vertex v) {
+
+    }
 }
