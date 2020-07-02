@@ -7,18 +7,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 
@@ -29,16 +17,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        //Create border, can play with parameters 
-        Border defaultBorder = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID,
-        new CornerRadii(1), new BorderWidths(2)));
-
-        Button commonEditButton = new Button("Edit graph"); //edit graph via mouse
-        commonEditButton.setLayoutX(50.0);
-        commonEditButton.setLayoutY(50.0);
-        commonEditButton.setPrefWidth(100.0);
-        commonEditButton.setPrefHeight(50.0);
-
         Button fileEditButton = new Button("File input"); //upload graph from file
         fileEditButton.setLayoutX(170.0);
         fileEditButton.setLayoutY(50.0);
@@ -52,7 +30,7 @@ public class App extends Application {
         clearGraphButton.setPrefHeight(50.0);
 
         Button onWatchModeButton = new Button("Watch"); //change mode to watch (and back to edit)
-        onWatchModeButton.setLayoutX(410.0);
+        onWatchModeButton.setLayoutX(50.0);
         onWatchModeButton.setLayoutY(50.0);
         onWatchModeButton.setPrefWidth(100.0);
         onWatchModeButton.setPrefHeight(50.0);
@@ -79,34 +57,15 @@ public class App extends Application {
         reRunAlgButton.setVisible(false);
 
 
-        Text editLogger = new Text("Edit Logger:"); //in fact just loggerButton, label is temporary
-        editLogger.setFont(Font.font("ComicSans", FontWeight.BOLD, 20));
-        //editLogger.setPrefWidth(200);
+        Label editLogger = new Label("Edit Logger:"); //in fact just loggerButton, label is temporary
+        editLogger.setPrefWidth(200);
         editLogger.setLayoutX(1000.0);
         editLogger.setLayoutY(120.0);
 
-        HBox graphBox = new HBox();
-        graphBox.setBorder(defaultBorder);
-        graphBox.setPrefHeight(700);
-        graphBox.setPrefWidth(900);
-        graphBox.setLayoutX(50);
-        graphBox.setLayoutY(120);
-
         //handlers
-        commonEditButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String str = editLogger.getText() + "\nDefolt edit pressed";
-                editLogger.setText(str);
-            }
-        });
-
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open Resource File");
-                fileChooser.showOpenDialog(stage);
                 String str = editLogger.getText() + "\nInput edit pressed";
                 editLogger.setText(str);
             }
@@ -126,7 +85,6 @@ public class App extends Application {
                 if(onWatchModeButton.getText() == "Watch"){
                     String str = "Algorithm Logger:";
                     editLogger.setText(str);
-                    commonEditButton.setDisable(true);
                     fileEditButton.setDisable(true);
                     clearGraphButton.setDisable(true);
                     onWatchModeButton.setText("Back to edit");
@@ -136,7 +94,6 @@ public class App extends Application {
                 }
                 else{
                     editLogger.setText("Edit Logger:");
-                    commonEditButton.setDisable(false);
                     fileEditButton.setDisable(false);
                     clearGraphButton.setDisable(false);
                     onWatchModeButton.setText("Watch");
@@ -171,8 +128,8 @@ public class App extends Application {
             }
         });
 
-        Group root = new Group(commonEditButton, editLogger, fileEditButton, clearGraphButton, onWatchModeButton,
-                makeAlgStepButton, runFullAlgButton, reRunAlgButton, graphBox);
+        Group root = new Group(editLogger, fileEditButton, clearGraphButton, onWatchModeButton,
+                makeAlgStepButton, runFullAlgButton, reRunAlgButton);
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
