@@ -4,6 +4,10 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
@@ -12,11 +16,16 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
+    //Var logger 
+    //Var GraphEditor
+    //Vars...
+      
     @Override
     public void start(Stage stage) {
         
         Border defaultBorder = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID,
         new CornerRadii(1), new BorderWidths(2)));
+
         Button fileEditButton = new Button("File input"); //upload graph from file
         fileEditButton.setLayoutX(170.0);
         fileEditButton.setLayoutY(50.0);
@@ -61,6 +70,13 @@ public class App extends Application {
         editLogger.setPrefWidth(200);
         editLogger.setLayoutX(1000.0);
         editLogger.setLayoutY(120.0);
+
+        HBox graphEditorBox = new HBox();
+        graphEditorBox.setBorder(defaultBorder);
+        graphEditorBox.setLayoutX(50);
+        graphEditorBox.setLayoutY(120);
+        graphEditorBox.setPrefHeight(700);
+        graphEditorBox.setPrefWidth(900);
 
         //handlers
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -129,7 +145,7 @@ public class App extends Application {
         });
 
         Group root = new Group(editLogger, fileEditButton, clearGraphButton, onWatchModeButton,
-                makeAlgStepButton, runFullAlgButton, reRunAlgButton);
+                makeAlgStepButton, runFullAlgButton, reRunAlgButton, graphEditorBox);
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
