@@ -3,10 +3,7 @@ package app;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.*;
 import javafx.stage.Stage;
 
 
@@ -17,6 +14,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        
+        Border defaultBorder = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID,
+        new CornerRadii(1), new BorderWidths(2)));
         Button fileEditButton = new Button("File input"); //upload graph from file
         fileEditButton.setLayoutX(170.0);
         fileEditButton.setLayoutY(50.0);
