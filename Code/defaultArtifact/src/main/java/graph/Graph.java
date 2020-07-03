@@ -1,9 +1,6 @@
 package graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**Class for storing information about graph and working with it */
 public class Graph implements IGraph {
@@ -58,6 +55,7 @@ public class Graph implements IGraph {
     @Override
     public void addVertex(Vertex v) {
         countOfVertex++;
+        v.setNumber(countOfVertex-1);
         graph.put(v, new ArrayList<>());
     }
 
@@ -81,11 +79,40 @@ public class Graph implements IGraph {
 
     @Override
     public void deleteVertex(Vertex v) {
+        if(!graph.containsKey(v)){
+            return;
+        }
+        ArrayList<Edge> edges = graph.get(v);
+        int size = edges.size();
+        for(int i = 0; i<size;i++){
+            deleteEdge(edges.get(0));
+        }
+        Vertex[] allV = graph.keySet().toArray(new Vertex[0]);
+        ArrayList<Edge> tmp = null;
+        ArrayList<Edge> edgeForDel = new ArrayList<>();
 
+        for (Vertex tmpV:allV) {
+            tmp = graph.get(tmpV);
+            for(Edge tmpE: tmp){
+                if(tmpE.end == v){
+                    edgeForDel.add(tmpE);
+                }
+            }
+        }
+        for(int i = 0; i<edgeForDel.size();i++){
+            deleteEdge(edgeForDel.get(i));
+        }
+        graph.remove(v);
+        countOfVertex--;
     }
 
     @Override
     public void deleteEdge(Edge e) {
 
+        if(graph.containsKey(e.start)&&graph.containsKey(e.end)){
+            Vertex start = e.start;
+            graph.get(start).remove(e);
+            countOfEdge--;
+        }
     }
 }

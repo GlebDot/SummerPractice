@@ -4,7 +4,11 @@ package graph;
 public class Vertex {
     int number;
 
-    void setNumber(int number){
+    public Vertex(){
+        number = -1;
+    }
+
+    public void setNumber(int number){
         this.number = number;
     }
 
@@ -14,4 +18,5 @@ public class Vertex {
         v.setNumber(number);
         return v;
     }
+
 }
