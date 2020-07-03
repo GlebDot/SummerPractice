@@ -1,8 +1,7 @@
 package graph;
-
 /**Class for storing information about graph and working with it */
 public class Graph implements IGraph {
-    
+
     @Override
     public IGraph clone() {
         return this;
