@@ -6,4 +6,5 @@ public interface IGraph {
     public abstract void addEdge(Edge e);
     public abstract void deleteEdge(Edge e);
     public abstract void deleteVertex(Vertex v);
+    public abstract void setStartVertex(Vertex v);
 }

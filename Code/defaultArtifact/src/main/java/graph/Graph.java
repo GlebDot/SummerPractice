@@ -5,10 +5,10 @@ import java.util.*;
 /**Class for storing information about graph and working with it */
 public class Graph implements IGraph {
 
-    protected Map<Vertex, ArrayList<Edge> > graph;
-    protected Vertex startVertex;
-    protected int countOfVertex;
-    protected int countOfEdge;
+    public Map<Vertex, ArrayList<Edge> > graph;
+    public Vertex startVertex;
+    public int countOfVertex;
+    public int countOfEdge;
 
     public Graph(){
         graph = new HashMap<>();
@@ -22,7 +22,8 @@ public class Graph implements IGraph {
         Graph newG = new Graph();
         Vertex[] allVertexOld = graph.keySet().toArray(new Vertex[0]);
         for(Vertex v: allVertexOld){
-            newG.addVertex(v.clone());
+            newG.countOfVertex++;
+            newG.graph.put(v.clone(), new ArrayList<>());
         }
 
         Vertex[] allVertexNew = newG.graph.keySet().toArray(new Vertex[0]);
@@ -32,7 +33,7 @@ public class Graph implements IGraph {
             ArrayList<Edge> edgesOld = graph.get(v);
             for(Edge e: edgesOld){
                 for(Vertex newVertx: allVertexNew){
-                    newVertx = (newVertx.number == startVertex.number)?(newG.startVertex=newVertx):newVertx;//так ли
+                    newG.startVertex = (startVertex!= null && newVertx.number == startVertex.number)?newVertx:null;
                     if(newVertx.number == e.start.number){
                         start = newVertx;
                     }
@@ -113,6 +114,15 @@ public class Graph implements IGraph {
             Vertex start = e.start;
             graph.get(start).remove(e);
             countOfEdge--;
+        }
+    }
+
+    @Override
+    public void setStartVertex(Vertex v) {
+        if(graph.containsKey(v)) {
+            this.startVertex = v;
+        }else{
+            //some error
         }
     }
 }

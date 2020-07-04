@@ -4,9 +4,10 @@ import java.util.Objects;
 
 /**Class for storing information about edge of the graph */
 public class Edge {
-    Vertex start;
-    Vertex end;
-    int weight;
+    public Vertex start;
+    public Vertex end;
+    public int weight;
+
 
     public Edge(int weight, Vertex start, Vertex end){
         this.start = start;
