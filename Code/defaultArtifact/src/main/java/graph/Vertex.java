@@ -1,7 +1,7 @@
 package graph;
 
 /**class for storing information about vertex of the graph */
-public class Vertex {
+public class Vertex implements Comparable<Vertex> {
     Graph h;
     public int number;
     public int distance;
@@ -28,4 +28,8 @@ public class Vertex {
         return v;
     }
 
+    @Override
+    public int compareTo(Vertex o) {
+        return this.number - o.number;
+    }
 }

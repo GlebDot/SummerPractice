@@ -4,6 +4,7 @@ import logger.*;
 import graph.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**Class for Ford-Bellman algorithm. Stores his own version of graph and work with it.
  * <p>Executes algorithm step by step with function {@link#stepForward}</p>
@@ -71,6 +72,7 @@ public class Algorithm implements IAlgorithm {
             e.printStackTrace();
         }
         Vertex[] allVertex = graph.graph.keySet().toArray(new Vertex[0]);
+        Arrays.sort(allVertex);
         for(Vertex v: allVertex){
             allEdge.addAll(graph.graph.get(v));
         }
