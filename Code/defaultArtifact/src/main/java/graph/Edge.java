@@ -15,6 +15,11 @@ public class Edge {
         this.weight = weight;
     }
 
+
+    public void changeWeight(int weight){
+        this.weight = weight;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,8 +29,6 @@ public class Edge {
                 this.end == edge.end;
     }
 
-//    public void changeWeight(int weight){
-//        this.weight = weight;
-//    }
+
 
 }
