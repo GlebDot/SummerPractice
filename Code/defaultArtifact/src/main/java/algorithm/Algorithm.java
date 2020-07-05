@@ -27,12 +27,12 @@ public class Algorithm implements IAlgorithm {
     @Override
     public AlgorithmMessage stepForward() {
         if(isFinish){
-            return new AlgorithmMessage();// already done work
+            return new AlgorithmMessage("The algorithm has already completed work");// already done work
         }
         if(indexOuterLoop >= (graph.countOfVertex - 1)){
             isFinish = true;
             //На этом шаге сообщается, присутствует ли в графе цикл отрицательного веса (сделать одним циклом или по шагам?)
-            return new AlgorithmMessage(); // DONE
+            return new AlgorithmMessage("The algorithm has completed work"); // DONE
         }
         if(indexInnerLoop<allEdge.size()){
             Edge tmp = allEdge.get(indexInnerLoop);
@@ -41,16 +41,16 @@ public class Algorithm implements IAlgorithm {
                 if(tmp.end.isCheck == false){
                     tmp.end.isCheck = true;
                     tmp.end.distance = tmp.start.distance + tmp.weight;
-                    return new AlgorithmMessage();//changed distance from infinity
+                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" from infinity: "+ tmp.end.distance);//changed distance from infinity
                 }
                 if ((tmp.end.distance > (tmp.start.distance + tmp.weight))) {
                     tmp.end.distance = tmp.start.distance + tmp.weight;
-                    return new AlgorithmMessage();//end v distance changed because found distance are less
+                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" because found distance are less "+ tmp.end.distance);//end v distance changed because found distance are less
                 }else{
-                    return new AlgorithmMessage();// nothing changed because found distance larger
+                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Nothing changed because found distance larger");// nothing changed because found distance larger
                 }
             }else{
-                return new AlgorithmMessage(); // nothing changed because startV "infinity"
+                return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+"Nothing changed because start vertex has mark \"infinity\""); // nothing changed because startV "infinity"
             }
         }else{
             indexOuterLoop++;
