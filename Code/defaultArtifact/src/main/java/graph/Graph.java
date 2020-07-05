@@ -33,7 +33,7 @@ public class Graph implements IGraph {
             ArrayList<Edge> edgesOld = graph.get(v);
             for(Edge e: edgesOld){
                 for(Vertex newVertx: allVertexNew){
-                    newG.startVertex = (startVertex!= null && newVertx.number == startVertex.number)?newVertx:null;
+                    newG.startVertex = (startVertex!= null && newVertx.number == startVertex.number)?newVertx:newG.startVertex;
                     if(newVertx.number == e.start.number){
                         start = newVertx;
                     }
@@ -110,6 +110,9 @@ public class Graph implements IGraph {
             if(tmpV.number == countOfVertex){
                 tmpV.setNumber(v.number);
             }
+        }
+        if(startVertex == v){
+            startVertex = null;
         }
     }
 
