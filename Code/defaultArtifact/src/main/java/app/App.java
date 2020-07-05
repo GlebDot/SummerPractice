@@ -15,7 +15,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import graphEditor.*;
+
+import logger.Logger;
+
 
 
 /**
@@ -23,11 +27,17 @@ import graphEditor.*;
  */
 public class App extends Application {
 
-    //Var logger 
+    private Logger logger;
+
     //Var GraphEditor
     //Vars...
 
+
     private IGraphEditor graphEditor;
+    public App(){
+        logger = Logger.getInstance(FXCollections.observableArrayList("Edit history:"));
+    }
+
 
     @Override
     public void start(Stage stage) {
@@ -50,8 +60,7 @@ public class App extends Application {
         loggerLabel.setLayoutY(120.0);
         loggerLabel.setBorder(defaultBorder);
 
-        ObservableList<String> strList = FXCollections.observableArrayList("Edit history:");
-        ListView<String> loggerTable = new ListView<String>(strList);
+        ListView<String> loggerTable = new ListView<String>(logger.strList);
         loggerTable.setPrefWidth(200);
         loggerTable.setPrefHeight(580);
         loggerTable.setLayoutX(1000.0);
@@ -85,8 +94,8 @@ public class App extends Application {
         clearGraphButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                strList.clear();
-                strList.add("Graph cleared");
+                logger.clear();
+                logger.logEvent("Graph cleared");
             }
         });
 
@@ -94,10 +103,9 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if(onWatchModeButton.getText() == "Watch"){
-                    String str = "Algorithm Logger:";
-                    strList.clear();
-                    strList.add("Algorithm steps:");
-                    loggerLabel.setText(str);
+                    logger.clear();
+                    logger.logEvent("Algorithm steps:");
+                    loggerLabel.setText("Algorithm Logger:");
                     fileEditButton.setDisable(true);
                     clearGraphButton.setDisable(true);
                     onWatchModeButton.setText("Back to edit");
@@ -107,8 +115,8 @@ public class App extends Application {
                 }
                 else{
                     loggerLabel.setText("Edit Logger:");
-                    strList.clear();
-                    strList.add("Edit history:");
+                    logger.clear();
+                    logger.logEvent("Edit history:");
                     fileEditButton.setDisable(false);
                     clearGraphButton.setDisable(false);
                     onWatchModeButton.setText("Watch");
@@ -122,21 +130,21 @@ public class App extends Application {
         makeAlgStepButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                strList.add("Making step...");
+                logger.logEvent("Making step...");
             }
         });
 
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                strList.add("Run full");
+                logger.logEvent("Run full");
             }
         });
 
         reRunAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                strList.add("start from the beginning");
+                logger.logEvent("start from the beginning");
             }
         });
 
@@ -146,7 +154,6 @@ public class App extends Application {
 
         stage.setScene(scene);
         stage.setTitle("Everlasting summer practice");
-        //scene.setFill(Color.GRAY);
         stage.setWidth(1250);
         stage.setHeight(800);
         stage.setScene(scene);
