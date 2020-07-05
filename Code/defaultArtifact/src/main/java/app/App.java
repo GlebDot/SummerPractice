@@ -1,11 +1,13 @@
 package app;
 
+import graphEditor.GraphEditor;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -13,7 +15,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import graphEditor.*;
+
 import logger.Logger;
+
 
 
 /**
@@ -26,9 +32,12 @@ public class App extends Application {
     //Var GraphEditor
     //Vars...
 
+
+    private IGraphEditor graphEditor;
     public App(){
         logger = Logger.getInstance(FXCollections.observableArrayList("Edit history:"));
     }
+
 
     @Override
     public void start(Stage stage) {
@@ -58,13 +67,20 @@ public class App extends Application {
         loggerTable.setLayoutY(140.0);
         loggerTable.setBorder(defaultBorder);
 
-        HBox graphEditorBox = new HBox();
+        Pane graphEditorBox = new Pane();
         graphEditorBox.setBorder(defaultBorder);
         graphEditorBox.setLayoutX(50);
         graphEditorBox.setLayoutY(120);
         graphEditorBox.setPrefHeight(600);
         graphEditorBox.setPrefWidth(900);
 
+        Canvas canvas = new Canvas();
+        canvas.setHeight(600);
+        canvas.setWidth(900);
+        
+        graphEditorBox.getChildren().add(canvas);
+        
+        graphEditor = new GraphEditor(canvas);
         //handlers
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override

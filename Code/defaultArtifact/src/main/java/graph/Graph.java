@@ -17,6 +17,7 @@ public class Graph implements IGraph {
         countOfVertex = 0;
     }
 
+
     @Override
     public Graph clone() throws CloneNotSupportedException  {
         Graph newG = new Graph();
