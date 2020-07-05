@@ -32,7 +32,7 @@ public class Algorithm implements IAlgorithm {
         if(indexOuterLoop >= (graph.countOfVertex - 1)){
             isFinish = true;
             //На этом шаге сообщается, присутствует ли в графе цикл отрицательного веса (сделать одним циклом или по шагам?)
-            return new AlgorithmMessage("The algorithm has completed work"); // DONE
+            return new AlgorithmMessage("The algorithm has completed work"+answer()); // DONE
         }
         if(indexInnerLoop<allEdge.size()){
             Edge tmp = allEdge.get(indexInnerLoop);
@@ -89,5 +89,16 @@ public class Algorithm implements IAlgorithm {
         }
         graph.startVertex.isStart = true;
         graph.startVertex.isCheck = true;
+    }
+
+    public String answer(){
+        Vertex[] allVertexNew = graph.graph.keySet().toArray(new Vertex[0]);
+        Arrays.sort(allVertexNew);
+        String ans = "\nResult: \n Start vertex: " + graph.startVertex.name+"\n";
+        for(Vertex v: allVertexNew){
+            ans= ans+"Vertex: "+v.number+" distance "+v.distance+"\n";
+
+        }
+        return ans;
     }
 }
