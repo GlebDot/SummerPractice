@@ -105,6 +105,12 @@ public class Graph implements IGraph {
         }
         graph.remove(v);
         countOfVertex--;
+        allV = graph.keySet().toArray(new Vertex[0]);
+        for(Vertex tmpV:allV){
+            if(tmpV.number == countOfVertex){
+                tmpV.setNumber(v.number);
+            }
+        }
     }
 
     @Override
