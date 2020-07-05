@@ -6,7 +6,9 @@ package logger;
 public class AlgorithmMessage {
     private String message;
 
-    public AlgorithmMessage(){}
+    public AlgorithmMessage(){
+        message = null;
+    }
 
     public AlgorithmMessage(String mes) {
         message = mes;
