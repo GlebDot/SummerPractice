@@ -15,9 +15,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import algorithm.*;
 import graphEditor.*;
-
+import graph.*;
+import logger.AlgorithmMessage;
 import logger.Logger;
 
 
@@ -28,6 +29,7 @@ import logger.Logger;
 public class App extends Application {
 
     private Logger logger;
+    private IAlgorithm algorithmSolver;
 
     //Var GraphEditor
     //Vars...
@@ -36,6 +38,7 @@ public class App extends Application {
     private IGraphEditor graphEditor;
     public App(){
         logger = Logger.getInstance(FXCollections.observableArrayList("Edit history:"));
+        algorithmSolver = new Algorithm();
     }
 
 
@@ -113,7 +116,8 @@ public class App extends Application {
                     runFullAlgButton.setVisible(true);
                     reRunAlgButton.setVisible(true);
 
-                    graphEditor.setState(false);
+                    graphEditor.setEditState(false);
+                    algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
                 }
                 else{
                     loggerLabel.setText("Edit Logger:");
@@ -126,7 +130,7 @@ public class App extends Application {
                     runFullAlgButton.setVisible(false);
                     reRunAlgButton.setVisible(false);
 
-                    graphEditor.setState(true);
+                    graphEditor.setEditState(true);
                 }
             }
         });
@@ -134,7 +138,8 @@ public class App extends Application {
         makeAlgStepButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logger.logEvent("Making step...");
+                AlgorithmMessage mes = algorithmSolver.stepForward();
+                logger.logEvent(mes.getMessage());
             }
         });
 

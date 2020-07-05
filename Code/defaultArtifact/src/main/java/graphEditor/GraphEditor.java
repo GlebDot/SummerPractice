@@ -3,13 +3,16 @@ package graphEditor;
 import java.util.ArrayList;
 
 import graph.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -19,7 +22,7 @@ enum EdgeDrawingStates {DRAW_EDGE, NOT_DRAW_EDGE}
 
 class EdgeVisual extends Group {
     Path line;
-    TextField textWeigth;
+    Spinner<Integer> textWeigth;
 
     protected Button source;
     protected Button finish;
@@ -55,7 +58,11 @@ class EdgeVisual extends Group {
         edgeRef = new Edge(0, start.getVertexRef(), end.getVertexRef());
 
         line = new Path();
-        textWeigth = new TextField("0");
+        textWeigth = new Spinner<Integer>();
+
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(-50, 50, 0);
+        textWeigth.setValueFactory(valueFactory);
+
 
         line.setStroke(Color.BLACK);
         line.setFill(Color.TRANSPARENT);
@@ -65,6 +72,16 @@ class EdgeVisual extends Group {
         } else {
             drawEdge();
         }
+
+        textWeigth.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_VERTICAL);
+        textWeigth.setEditable(true);
+
+        textWeigth.valueProperty().addListener(new ChangeListener<Integer>() {
+            @Override
+            public void changed(ObservableValue<? extends Integer> value, Integer oldValue, Integer newValue) {
+                edgeRef.changeWeight(newValue);
+            }
+        });
 
         setWeigthTextPosition();
 
@@ -143,9 +160,9 @@ class EdgeVisual extends Group {
         } else {
             double textOffset = 0.0;
             if (source.getLayoutY() > finish.getLayoutY()) {
-                textOffset = 20;
+                textOffset = 50;
             } else {
-                textOffset = -20;
+                textOffset = -50;
             }
             double textStartX = Math.min(source.getLayoutX(), finish.getLayoutX());
             double textStartY = Math.min(source.getLayoutY(), finish.getLayoutY());
@@ -154,7 +171,8 @@ class EdgeVisual extends Group {
             textY = Math.abs(source.getLayoutY() - finish.getLayoutY()) / 2.0 + textStartY + textOffset;
         }
 
-        textWeigth.setMaxWidth(35);
+
+        textWeigth.setMaxWidth(50);
         textWeigth.setLayoutX(textX);
         textWeigth.setLayoutY(textY);
     }
@@ -309,7 +327,7 @@ public class GraphEditor implements IGraphEditor {
     }
 
     @Override
-    public void setState(boolean isEditState) {
+    public void setEditState(boolean isEditState) {
         isEditing = isEditState;
     }
 
