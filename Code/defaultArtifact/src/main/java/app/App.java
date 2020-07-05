@@ -115,7 +115,6 @@ public class App extends Application {
                     makeAlgStepButton.setVisible(true);
                     runFullAlgButton.setVisible(true);
                     reRunAlgButton.setVisible(true);
-
                     graphEditor.setEditState(false);
                     algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
                 }
@@ -129,7 +128,6 @@ public class App extends Application {
                     makeAlgStepButton.setVisible(false);
                     runFullAlgButton.setVisible(false);
                     reRunAlgButton.setVisible(false);
-
                     graphEditor.setEditState(true);
                 }
             }
@@ -139,7 +137,7 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent event) {
                 AlgorithmMessage mes = algorithmSolver.stepForward();
-                logger.logEvent(mes.getMessage());
+                logger.logEvent(logger.prepare(mes.getMessage()));
             }
         });
 

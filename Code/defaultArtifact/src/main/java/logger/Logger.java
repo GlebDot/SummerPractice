@@ -34,4 +34,31 @@ public class Logger implements ILogger {
     public void clear() {
         strList.clear();
     }
+
+    @Override
+    public  String prepare(String message){
+        StringBuilder str = new StringBuilder(message);
+        int i = 0;
+        int counter = 0;
+        while(i != str.length()){
+            if(i%29 == 0 && i != 0){
+                if(str.charAt(i) == ' '){
+                    str.insert(i,"\n");
+                }
+                else{
+                    while(str.charAt(i) != ' '){
+                        i--;
+                        counter++;
+                        if(str.charAt(i) == ' '){
+                            str.insert(i,"\n");
+                            i+= counter;
+                            break;
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        return str.toString();
+    }
 }
