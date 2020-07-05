@@ -96,7 +96,7 @@ public class Algorithm implements IAlgorithm {
         Arrays.sort(allVertexNew);
         String ans = "\nResult: \n Start vertex: " + graph.startVertex.name+"\n";
         for(Vertex v: allVertexNew){
-            ans= ans+"Vertex: "+v.number+" distance "+v.distance+"\n";
+            ans= ans + "Vertex: " + v.name + " distance " + v.distance + "\n";
 
         }
         return ans;
