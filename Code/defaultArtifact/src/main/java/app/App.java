@@ -112,6 +112,8 @@ public class App extends Application {
                     makeAlgStepButton.setVisible(true);
                     runFullAlgButton.setVisible(true);
                     reRunAlgButton.setVisible(true);
+
+                    graphEditor.setState(false);
                 }
                 else{
                     loggerLabel.setText("Edit Logger:");
@@ -123,6 +125,8 @@ public class App extends Application {
                     makeAlgStepButton.setVisible(false);
                     runFullAlgButton.setVisible(false);
                     reRunAlgButton.setVisible(false);
+
+                    graphEditor.setState(true);
                 }
             }
         });

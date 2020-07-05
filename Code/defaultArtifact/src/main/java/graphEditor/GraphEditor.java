@@ -191,6 +191,7 @@ class NodeVisual extends Button {
 /**Class for editing and bulding graph */
 public class GraphEditor implements IGraphEditor {
     private IGraph graph;
+    private boolean isEditing;
     
     private Canvas canvas;
     private GraphicsContext context;
@@ -204,6 +205,7 @@ public class GraphEditor implements IGraphEditor {
     private int graphNodesCount;
 
     public GraphEditor(Canvas canvas) {
+        isEditing = true;
         this.canvas = canvas;
         context = canvas.getGraphicsContext2D();
         parentBox = (Pane)canvas.getParent();
@@ -214,7 +216,7 @@ public class GraphEditor implements IGraphEditor {
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getButton().compareTo(MouseButton.PRIMARY) == 0) {
+                if (event.getButton().compareTo(MouseButton.PRIMARY) == 0 && isEditing) {
                     NodeVisual graphNode = createGraphNodeButton();
                     graphNode.setLayoutX(event.getX());
                     graphNode.setLayoutY(event.getY());
@@ -236,12 +238,14 @@ public class GraphEditor implements IGraphEditor {
         graphNode.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (edgeState == EdgeDrawingStates.NOT_DRAW_EDGE) {
-                    edgeState = EdgeDrawingStates.DRAW_EDGE;
-                    edgeDrawBegin(graphNode);
-                } else {
-                    edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
-                    edgeDrawEnd(graphNode);
+                if (isEditing) {
+                    if (edgeState == EdgeDrawingStates.NOT_DRAW_EDGE) {
+                        edgeState = EdgeDrawingStates.DRAW_EDGE;
+                        edgeDrawBegin(graphNode);
+                    } else {
+                        edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
+                        edgeDrawEnd(graphNode);
+                    }
                 }
             }
         });
@@ -250,7 +254,7 @@ public class GraphEditor implements IGraphEditor {
         graphNode.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getButton().compareTo(MouseButton.SECONDARY) == 0) {
+                if (event.getButton().compareTo(MouseButton.SECONDARY) == 0 && isEditing) {
                     System.out.println("Delete vertex: " + graphNode.getText());
                     graph.deleteVertex(graphNode.getVertexRef());
 
@@ -275,7 +279,7 @@ public class GraphEditor implements IGraphEditor {
         edge.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getButton().compareTo(MouseButton.SECONDARY) == 0) {
+                if (event.getButton().compareTo(MouseButton.SECONDARY) == 0 && isEditing) {
                     graph.deleteEdge(edge.getEdgeRef());
                     parentBox.getChildren().remove(edge);
                 }
@@ -305,13 +309,8 @@ public class GraphEditor implements IGraphEditor {
     }
 
     @Override
-    public void addVertex(Vertex v) {
-
-    }
-
-    @Override
-    public void addEdge(Edge e) {
-
+    public void setState(boolean isEditState) {
+        isEditing = isEditState;
     }
 
     @Override 
