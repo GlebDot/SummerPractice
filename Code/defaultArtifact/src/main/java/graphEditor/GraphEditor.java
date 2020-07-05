@@ -23,6 +23,11 @@ class EdgeVisual extends Group {
 
     protected Button source;
     protected Button finish;
+    protected Edge edgeRef;
+
+    public Edge getEdgeRef() {
+        return edgeRef;
+    }
 
     @Override 
     public boolean equals(Object o) {
@@ -43,12 +48,14 @@ class EdgeVisual extends Group {
         return false;
     }
 
-    public EdgeVisual(Button start, Button end) {
+    public EdgeVisual(NodeVisual start, NodeVisual end) {
         source = start;
         finish = end;
 
+        edgeRef = new Edge(0, start.getVertexRef(), end.getVertexRef());
+
         line = new Path();
-        textWeigth = new TextField("-1");
+        textWeigth = new TextField("0");
 
         line.setStroke(Color.BLACK);
         line.setFill(Color.TRANSPARENT);
@@ -157,12 +164,20 @@ class EdgeVisual extends Group {
 class NodeVisual extends Button {
     private ArrayList<EdgeVisual> edgeRefs;
 
+    private Vertex nodeRef;
+
+    public Vertex getVertexRef() {
+        return nodeRef;
+    }
+
     public NodeVisual(String name) {
         super(name);
         edgeRefs = new ArrayList<EdgeVisual>();
         setShape(new Circle(15));
         setMaxSize(30, 30);
         setMinSize(30, 30);
+
+        nodeRef = new Vertex(name);
     }
 
     public void setEdge(EdgeVisual edge) {
@@ -194,6 +209,7 @@ public class GraphEditor implements IGraphEditor {
         parentBox = (Pane)canvas.getParent();
         graphNodesCount = 0;
         edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
+        graph = new Graph();
 
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -213,6 +229,8 @@ public class GraphEditor implements IGraphEditor {
         String buttonName = "" + (char)('A' + graphNodesCount);
         NodeVisual graphNode = new NodeVisual(buttonName);
         graphNodesCount++;
+
+        graph.addVertex(graphNode.getVertexRef());
         
 
         graphNode.setOnAction(new EventHandler<ActionEvent>() {
@@ -228,11 +246,14 @@ public class GraphEditor implements IGraphEditor {
             }
         });
 
+        //delete vertex event
         graphNode.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.SECONDARY) == 0) {
                     System.out.println("Delete vertex: " + graphNode.getText());
+                    graph.deleteVertex(graphNode.getVertexRef());
+
                     ArrayList<EdgeVisual> edgesToRemove = graphNode.getEdges();
                     for (EdgeVisual edge : edgesToRemove) {
                         parentBox.getChildren().remove(edge);
@@ -245,13 +266,17 @@ public class GraphEditor implements IGraphEditor {
         return graphNode;
     }
 
-    private EdgeVisual createEdge(Button start, Button end) {
+    private EdgeVisual createEdge(NodeVisual start, NodeVisual end) {
         EdgeVisual edge = new EdgeVisual(start, end);
 
+        graph.addEdge(edge.getEdgeRef());
+
+        //Delete edge event
         edge.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.SECONDARY) == 0) {
+                    graph.deleteEdge(edge.getEdgeRef());
                     parentBox.getChildren().remove(edge);
                 }
             }
