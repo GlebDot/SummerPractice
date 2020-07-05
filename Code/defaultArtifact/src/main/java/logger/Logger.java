@@ -39,25 +39,35 @@ public class Logger implements ILogger {
     public  String prepare(String message){
         StringBuilder str = new StringBuilder(message);
         int i = 0;
-        int counter = 0;
-        while(i != str.length()){
-            if(i%29 == 0 && i != 0){
-                if(str.charAt(i) == ' '){
-                    str.insert(i,"\n");
+        int currLen = 0;
+        while((i+currLen) != str.length()){
+            if(str.charAt(i+currLen) == '\n'){
+                i+=currLen;
+                i++;
+                currLen = 0;
+                continue;
+            }
+            if(currLen == 29){
+                if(str.charAt(i+currLen) == ' ' || str.charAt(i+currLen) == '\n'){
+                    str.setCharAt(i+currLen, '\n');
                 }
                 else{
-                    while(str.charAt(i) != ' '){
-                        i--;
-                        counter++;
-                        if(str.charAt(i) == ' '){
-                            str.insert(i,"\n");
-                            i+= counter;
+                    while(str.charAt(i+currLen) != ' ' || str.charAt(i+currLen) == '\n'){
+                        currLen--;
+                        if(str.charAt(i+currLen) == ' '){
+                            str.setCharAt(i+currLen, '\n');
                             break;
                         }
                     }
                 }
             }
+            else{
+                currLen++;
+                continue;
+            }
+            i+=currLen;
             i++;
+            currLen = 0;
         }
         return str.toString();
     }
