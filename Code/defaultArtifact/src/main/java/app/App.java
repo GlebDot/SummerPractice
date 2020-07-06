@@ -1,6 +1,8 @@
 package app;
 
 import graphEditor.GraphEditor;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,9 +17,18 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import algorithm.*;
 import graphEditor.*;
 import graph.*;
+import javafx.util.Duration;
 import logger.AlgorithmMessage;
 import logger.Logger;
 
@@ -106,7 +117,7 @@ public class App extends Application {
         onWatchModeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(onWatchModeButton.getText() == "Watch"){
+                if(onWatchModeButton.getText().equals("Watch")){
                     logger.clear();
                     logger.logEvent("Algorithm steps:");
                     loggerLabel.setText("Algorithm Logger:");
@@ -145,7 +156,18 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logger.logEvent("Run full");
+                Timeline timeline = new Timeline();
+                timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent actionEvent) {
+                        AlgorithmMessage mes = algorithmSolver.stepForward();
+                        logger.logEvent(logger.prepare(mes.getMessage()));
+                        if(mes.getMessage().substring(0, 3).equals("The")){
+                            timeline.stop();
+                        }
+                    }
+                }));
+                timeline.setCycleCount(Timeline.INDEFINITE);
+                timeline.play();
             }
         });
 

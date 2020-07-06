@@ -17,6 +17,8 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Label;
@@ -282,11 +284,12 @@ public class GraphEditor implements IGraphEditor {
         graphNodesCount = 0;
         edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
         graph = new Graph();
+        graphNodes = new ArrayList<NodeVisual>();
 
         nodeLabels = new ArrayList<Label>();
         graphNodes = new ArrayList<NodeVisual>();
         graphEdges = new ArrayList<EdgeVisual>();
-
+        //add Vertex
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -319,6 +322,7 @@ public class GraphEditor implements IGraphEditor {
     private NodeVisual createGraphNodeButton() {
         String buttonName = "" + (char)('A' + graphNodesCount);
         NodeVisual graphNode = new NodeVisual(buttonName);
+
         graphNodesCount++;
 
         graph.addVertex(graphNode.getVertexRef());
@@ -399,6 +403,16 @@ public class GraphEditor implements IGraphEditor {
         });
 
         return edge;
+    }
+
+    private void setStartNode(NodeVisual node) {
+        if (startNode != null) {
+            startNode.setTextFill(Color.BLACK);
+        }
+
+        startNode = node;
+        startNode.setTextFill(Color.FIREBRICK);
+        graph.setStartVertex(startNode.getVertexRef());
     }
 
     private void edgeDrawBegin(NodeVisual clickedButton) {
