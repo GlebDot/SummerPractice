@@ -27,7 +27,7 @@ public class Vertex implements Comparable<Vertex> {
 
     @Override
     public Vertex clone() throws CloneNotSupportedException {
-        Vertex v = new Vertex();
+        Vertex v = new Vertex(name);
         v.setNumber(number);
         return v;
     }

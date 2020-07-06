@@ -110,8 +110,10 @@ public class Algorithm implements IAlgorithm {
                 }
             }
         }
-        graph.startVertex.isStart = true;
-        graph.startVertex.isCheck = true;
+        if(graph.startVertex != null) {
+            graph.startVertex.isStart = true;
+            graph.startVertex.isCheck = true;
+        }
     }
 
     public String answer(){
@@ -119,7 +121,7 @@ public class Algorithm implements IAlgorithm {
         Arrays.sort(allVertexNew);
         String ans = "\nResult: \n Start vertex: " + graph.startVertex.name+"\n";
         for(Vertex v: allVertexNew){
-            ans= ans+"Vertex: "+v.number+" distance "+v.distance+"\n";
+            ans= ans + "Vertex: " + v.name + " distance " + v.distance + "\n";
 
         }
         return ans;
