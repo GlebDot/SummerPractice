@@ -1,5 +1,6 @@
 package logger;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 //should use singleton and proxy patterns
@@ -9,13 +10,13 @@ public class Logger implements ILogger {
 
     public ObservableList<String> strList;
 
-    private Logger(ObservableList<String> list){
-        this.strList = list;
+    private Logger(){
+        this.strList = FXCollections.observableArrayList("Edit history:");
     }
 
-    public static Logger getInstance(ObservableList<String> list) {
+    public static Logger getInstance() {
         if (instance == null) {
-            instance = new Logger(list);
+            instance = new Logger();
         }
         return instance;
     }
