@@ -151,7 +151,8 @@ public class App extends Application {
         reRunAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logger.logEvent("start from the beginning");
+                logger.clear();
+                algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
             }
         });
 
