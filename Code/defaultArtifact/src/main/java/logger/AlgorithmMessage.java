@@ -32,8 +32,10 @@ public class AlgorithmMessage {
     public AlgorithmMessage(String mes, Edge viewingEdge, boolean isFinish) {
         message = mes;
         this.viewingEdge = viewingEdge;
-        this.changeV = viewingEdge.end;
-        this.startV = viewingEdge.start;
+        if(viewingEdge!= null) {
+            this.changeV = viewingEdge.end;
+            this.startV = viewingEdge.start;
+        }
         this.isFinish = isFinish;
     }
 
