@@ -1,9 +1,15 @@
 package graphEditor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import graph.*;
 import javafx.beans.value.ChangeListener;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,10 +21,13 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.Label;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.util.*;
+
 
 enum EdgeDrawingStates {DRAW_EDGE, NOT_DRAW_EDGE}
 
@@ -53,7 +62,7 @@ class EdgeVisual extends Group {
         return false;
     }
 
-    public EdgeVisual(NodeVisual start, NodeVisual end) {
+    public EdgeVisual(NodeVisual start, NodeVisual end, boolean isDoubleEdge) {
         source = start;
         finish = end;
 
@@ -72,7 +81,7 @@ class EdgeVisual extends Group {
         if (source.getLayoutX() == finish.getLayoutX() && finish.getLayoutY() == source.getLayoutY()) {
             drawLoop();
         } else {
-            drawEdge();
+            drawEdge(isDoubleEdge);
         }
 
         textWeigth.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_VERTICAL);
@@ -116,7 +125,7 @@ class EdgeVisual extends Group {
         line.getElements().add(new LineTo(x2, y2));
     }
 
-    private void drawEdge() {
+    private void drawEdge(boolean isDouble) {
         double startX = source.getLayoutX() + source.getBoundsInParent().getWidth() / 2.0;
         double startY = source.getLayoutY() + source.getBoundsInParent().getHeight() / 2.0;
 
@@ -144,7 +153,11 @@ class EdgeVisual extends Group {
         double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * 15.0 + endY;
 
         line.getElements().add(new MoveTo(startX, startY));
-        line.getElements().add(new LineTo(endX, endY));
+        if (!isDouble) {
+            line.getElements().add(new LineTo(endX, endY));
+        } else {
+            line.getElements().add(new MoveTo(endX, endY));
+        }
 
         line.getElements().add(new LineTo(x1, y1));
         line.getElements().add(new MoveTo(endX, endY));
@@ -185,9 +198,27 @@ class NodeVisual extends Button {
     private ArrayList<EdgeVisual> edgeRefs;
 
     private Vertex nodeRef;
+    private Label labelRef;
 
     public Vertex getVertexRef() {
         return nodeRef;
+    }
+
+    public void setLabelRef(Label label) {
+        labelRef = label;
+    }
+
+    public void setNewLabelValue(String info) {
+        labelRef.setText(info);
+        labelRef.setTextFill(Color.FIREBRICK);
+
+        final Timeline timeline = new Timeline();
+        timeline.setCycleCount(1);
+        timeline.setAutoReverse(false);
+        final KeyValue kv = new KeyValue(labelRef.textFillProperty(), Color.BLACK, Interpolator.EASE_BOTH);
+        final KeyFrame kf = new KeyFrame(Duration.millis(1500), kv);
+        timeline.getKeyFrames().add(kf);
+        timeline.play();
     }
 
     public NodeVisual(String name) {
@@ -226,13 +257,17 @@ class NodeVisual extends Button {
 public class GraphEditor implements IGraphEditor {
     private IGraph graph;
     private boolean isEditing;
+
+    private NodeVisual startNode;
     
     private Canvas canvas;
     private GraphicsContext context;
     private Pane parentBox;
 
+
     private ArrayList<NodeVisual> graphNodes;
-    private NodeVisual startNode;
+    private ArrayList<Label> nodeLabels;
+    private ArrayList<EdgeVisual> graphEdges;
 
     private EdgeDrawingStates edgeState;
 
@@ -251,6 +286,9 @@ public class GraphEditor implements IGraphEditor {
         graph = new Graph();
         graphNodes = new ArrayList<NodeVisual>();
 
+        nodeLabels = new ArrayList<Label>();
+        graphNodes = new ArrayList<NodeVisual>();
+        graphEdges = new ArrayList<EdgeVisual>();
         //add Vertex
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -260,15 +298,25 @@ public class GraphEditor implements IGraphEditor {
                     graphNode.setLayoutX(event.getX());
                     graphNode.setLayoutY(event.getY());
                     parentBox.getChildren().add(graphNode);
-                    edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
                     graphNodes.add(graphNode);
+                    edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
 
                     if (graphNodes.size() == 1) {
-                        setStartNode(graphNodes.get(0));
+                        setStartVertex(graphNode);
                     }
                 }
             }
         });
+    }
+
+    private void setStartVertex(NodeVisual node) {
+        if (startNode != null) {
+            startNode.setStyle("-fx-background-color: #7b7b7b");
+        }
+
+        startNode = node;
+        graph.setStartVertex(startNode.getVertexRef());
+        startNode.setStyle("-fx-background-color: #ff0000");
     }
 
     private NodeVisual createGraphNodeButton() {
@@ -306,12 +354,12 @@ public class GraphEditor implements IGraphEditor {
                     ArrayList<EdgeVisual> edgesToRemove = graphNode.getEdges();
                     for (EdgeVisual edge : edgesToRemove) {
                         parentBox.getChildren().remove(edge);
+                        graphEdges.remove(edge);
                     }
-                    parentBox.getChildren().remove(graphNode);
                     graphNodes.remove(graphNode);
-
-                    if (graphNode.equals(startNode) && graphNodes.size() > 0) {
-                        setStartNode(graphNodes.get(0));
+                    parentBox.getChildren().remove(graphNode);
+                    if (graphNode.equals(startNode) && !graphNodes.isEmpty()) {
+                        setStartVertex(graphNodes.get(0));
                     }
                 }
             }
@@ -321,7 +369,7 @@ public class GraphEditor implements IGraphEditor {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.MIDDLE) == 0 && isEditing) {
-                    setStartNode(graphNode);
+                    setStartVertex(graphNode);
                 }
             }
         });
@@ -330,17 +378,26 @@ public class GraphEditor implements IGraphEditor {
     }
 
     private EdgeVisual createEdge(NodeVisual start, NodeVisual end) {
-        EdgeVisual edge = new EdgeVisual(start, end);
+        EdgeVisual tryEdge = new EdgeVisual(end, start, true);
+        EdgeVisual edge;
+        if (graphEdges.contains(tryEdge)) {
+            edge = new EdgeVisual(start, end, true);
+        } else {
+            edge = new EdgeVisual(start, end, false);
+        }
+        
 
         graph.addEdge(edge.getEdgeRef());
 
+        graphEdges.add(edge);
         //Delete edge event
-        edge.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        edge.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.SECONDARY) == 0 && isEditing) {
                     graph.deleteEdge(edge.getEdgeRef());
                     parentBox.getChildren().remove(edge);
+                    graphEdges.remove(edge);
                 }
             }
         });
@@ -373,17 +430,102 @@ public class GraphEditor implements IGraphEditor {
             edgeStart.setEdge(edgeVis);
 
             parentBox.getChildren().add(edgeVis);
-            System.out.println("Add edge");
+        }
+    }
+
+    private void prepareGraphEditor() {
+        for (NodeVisual node : graphNodes) {
+
+            Label nodeLabel = new Label();
+            nodeLabel.setLayoutY(node.getLayoutY() + node.getMinHeight());
+            nodeLabel.setLayoutX(node.getLayoutX());
+
+            nodeLabel.setText("inf");
+
+            parentBox.getChildren().add(nodeLabel);
+            nodeLabels.add(nodeLabel);
+            node.setLabelRef(nodeLabel);
+        }
+
+        for (EdgeVisual edge : graphEdges) {
+            edge.textWeigth.setDisable(true);
+        }
+    }
+
+    private void clearGraphEditorLabels() {
+        for (Label label : nodeLabels) {
+            parentBox.getChildren().remove(label);
+        }
+
+        for (EdgeVisual edge : graphEdges) {
+            edge.line.setStroke(Color.BLACK);
+        }
+
+        nodeLabels.clear();
+
+        for (EdgeVisual edge : graphEdges) {
+            edge.textWeigth.setDisable(false);
         }
     }
 
     @Override
     public void setEditState(boolean isEditState) {
         isEditing = isEditState;
+        if (!isEditing) {
+            prepareGraphEditor();
+        } else {
+            clearGraphEditorLabels();
+        }
     }
 
     @Override 
     public IGraph getGraph() {
         return graph;
+    }
+
+
+    @Override
+    public void setCurrentEdge() {
+        System.out.println("It's me Pario");
+        graphEdges.get(0).line.setStroke(Color.RED);
+        // for (EdgeVisual edgeVis : graphEdges) {
+        //     if (edge.equals(edgeVis.getEdgeRef())) {
+        //         edgeVis.line.setFill(Color.RED);
+        //         break;
+        //     }
+        // }
+    }
+
+    @Override
+    public void setCurrentVertex() {
+        System.out.println("It's me Pario");
+        graphNodes.get(0).setStyle("-fx-background-color: #ff0000");
+        graphNodes.get(0).setNewLabelValue("-10");
+        // for (NodeVisual node : graphNodes) {
+        //     if (node.equals(vertex)) {
+        //         node.setStyle("-fx-background-color: #ff0000");
+        //         break;
+        //     }
+        // }
+    }
+
+    @Override 
+    public void clearEditor() {
+        for (NodeVisual node : graphNodes) {
+            graph.deleteVertex(node.getVertexRef());
+            parentBox.getChildren().remove(node);
+        }
+
+        for (EdgeVisual edge : graphEdges) {
+            parentBox.getChildren().remove(edge);
+        }
+
+        graphNodes.clear();
+        graphEdges.clear();
+    }
+
+    @Override
+    public void loadGraph(Graph graph) {
+
     }
 }

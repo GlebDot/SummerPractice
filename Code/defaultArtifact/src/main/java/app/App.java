@@ -110,6 +110,7 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 logger.clear();
                 logger.logEvent("Graph cleared");
+                graphEditor.clearEditor();
             }
         });
 
