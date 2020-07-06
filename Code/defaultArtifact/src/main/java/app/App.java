@@ -22,8 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 import algorithm.*;
 import graphEditor.*;
@@ -48,7 +46,7 @@ public class App extends Application {
 
     private IGraphEditor graphEditor;
     public App(){
-        logger = Logger.getInstance(FXCollections.observableArrayList("Edit history:"));
+        logger = Logger.getInstance();
         algorithmSolver = new Algorithm();
     }
 
@@ -110,7 +108,6 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 logger.clear();
                 logger.logEvent("Graph cleared");
-                graphEditor.clearEditor();
             }
         });
 
