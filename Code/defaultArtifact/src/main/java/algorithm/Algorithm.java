@@ -92,8 +92,10 @@ public class Algorithm implements IAlgorithm {
                 }
             }
         }
-        graph.startVertex.isStart = true;
-        graph.startVertex.isCheck = true;
+        if(graph.startVertex != null) {
+            graph.startVertex.isStart = true;
+            graph.startVertex.isCheck = true;
+        }
     }
 
     public String answer(){
