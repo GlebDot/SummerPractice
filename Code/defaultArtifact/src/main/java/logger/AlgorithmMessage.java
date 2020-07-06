@@ -12,6 +12,22 @@ public class AlgorithmMessage {
 
     public AlgorithmMessage(String mes) {
         message = mes;
+
+        viewingEdge = null;
+        changeV = null;
+        startV = null;
+        isFinish = false;
+    }
+
+    public AlgorithmMessage(String mes, Edge viewingEdge, boolean isFinish) {
+        message = mes;
+        this.viewingEdge = viewingEdge;
+        if(viewingEdge!= null) {
+            this.changeV = viewingEdge.end;
+            this.startV = viewingEdge.start;
+        }
+        this.isFinish = isFinish;
+
     }
 
     public String getMessage() {
