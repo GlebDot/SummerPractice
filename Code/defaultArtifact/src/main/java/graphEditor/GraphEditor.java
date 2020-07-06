@@ -69,6 +69,7 @@ class EdgeVisual extends Group {
         edgeRef = new Edge(0, start.getVertexRef(), end.getVertexRef());
 
         line = new Path();
+        line.setStrokeWidth(3);
         textWeigth = new Spinner<Integer>();
 
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(-50, 50, 0);
@@ -111,8 +112,8 @@ class EdgeVisual extends Group {
 
         line.getElements().add(new ArcTo(25, 25, 0, endX, endY, true, false));
 
-        double sin = Math.sin(-1.5);
-        double cos = Math.cos(-1.5);
+        double sin = Math.sin(-1.7);
+        double cos = Math.cos(-1.7);
 
         double x1 = (- 1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * 15.0 + endX;
         double y1 = (- 1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * 15.0 + endY;
@@ -121,7 +122,7 @@ class EdgeVisual extends Group {
         double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * 15.0 + endY;
 
         line.getElements().add(new LineTo(x1, y1));
-        line.getElements().add(new MoveTo(endX, endY));
+        line.getElements().add(new MoveTo(endX - line.getStrokeWidth(), endY));
         line.getElements().add(new LineTo(x2, y2));
     }
 
@@ -136,11 +137,11 @@ class EdgeVisual extends Group {
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
 
-        startX += source.getBoundsInParent().getWidth() / 2.0 * cos;
-        startY += source.getBoundsInParent().getWidth() / 2.0 * sin;
+        startX += (line.getStrokeWidth() + source.getBoundsInParent().getWidth()) / 2.0 * cos;
+        startY += (line.getStrokeWidth() + source.getBoundsInParent().getWidth()) / 2.0 * sin;
 
-        endX -= source.getBoundsInParent().getWidth() / 2.0 * cos;
-        endY -= source.getBoundsInParent().getWidth() / 2.0 * sin;
+        endX -= (line.getStrokeWidth() * 2 + source.getBoundsInParent().getWidth() / 2.0) * cos;
+        endY -= (line.getStrokeWidth() * 2 + source.getBoundsInParent().getWidth()) / 2.0 * sin;
 
         angle -= Math.PI / 2;
         sin = Math.sin(angle);
@@ -274,6 +275,9 @@ public class GraphEditor implements IGraphEditor {
     private NodeVisual edgeStart;
     private NodeVisual edgeEnd;
 
+    private NodeVisual hightligthedNode;
+    private EdgeVisual hightligthedEdge;
+
     private int graphNodesCount;
 
     public GraphEditor(Canvas canvas) {
@@ -311,12 +315,12 @@ public class GraphEditor implements IGraphEditor {
 
     private void setStartVertex(NodeVisual node) {
         if (startNode != null) {
-            startNode.setStyle("-fx-background-color: #7b7b7b");
+            startNode.setTextFill(Color.BLACK);;
         }
 
         startNode = node;
         graph.setStartVertex(startNode.getVertexRef());
-        startNode.setStyle("-fx-background-color: #ff0000");
+        startNode.setTextFill(Color.FIREBRICK);;
     }
 
     private NodeVisual createGraphNodeButton() {
@@ -447,6 +451,8 @@ public class GraphEditor implements IGraphEditor {
             node.setLabelRef(nodeLabel);
         }
 
+        startNode.setNewLabelValue("0");
+
         for (EdgeVisual edge : graphEdges) {
             edge.textWeigth.setDisable(true);
         }
@@ -485,28 +491,37 @@ public class GraphEditor implements IGraphEditor {
 
 
     @Override
-    public void setCurrentEdge() {
+    public void setCurrentEdge(Edge e) {
         System.out.println("It's me Pario");
-        graphEdges.get(0).line.setStroke(Color.RED);
-        // for (EdgeVisual edgeVis : graphEdges) {
-        //     if (edge.equals(edgeVis.getEdgeRef())) {
-        //         edgeVis.line.setFill(Color.RED);
-        //         break;
-        //     }
-        // }
+        if (hightligthedEdge != null) {
+            hightligthedEdge.line.setStroke(Color.BLACK);
+        }
+        for (EdgeVisual edgeVis : graphEdges) {
+            if (e.start.name == edgeVis.edgeRef.start.name && e.end.name == edgeVis.edgeRef.end.name) {
+                hightligthedEdge = edgeVis;
+                edgeVis.line.setStroke(Color.RED);
+                break;
+            }
+        }
     }
 
     @Override
-    public void setCurrentVertex() {
+    public void setCurrentVertex(Vertex v) {
+        if (hightligthedNode != null) {
+            hightligthedNode.setTextFill(Color.BLACK);
+        }
         System.out.println("It's me Pario");
-        graphNodes.get(0).setStyle("-fx-background-color: #ff0000");
-        graphNodes.get(0).setNewLabelValue("-10");
-        // for (NodeVisual node : graphNodes) {
-        //     if (node.equals(vertex)) {
-        //         node.setStyle("-fx-background-color: #ff0000");
-        //         break;
-        //     }
-        // }
+        for (NodeVisual node : graphNodes) {
+            if (v.name == node.getVertexRef().name) {
+                hightligthedNode = node;
+                node.setTextFill(Color.GREEN);
+
+                if (v.isCheck) {
+                    hightligthedNode.setNewLabelValue(new Integer(v.distance).toString());
+                }
+                break;
+            }
+        }
     }
 
     @Override 
@@ -522,6 +537,17 @@ public class GraphEditor implements IGraphEditor {
 
         graphNodes.clear();
         graphEdges.clear();
+    }
+
+    @Override
+    public void rerunEditor() {
+        if (hightligthedEdge != null) {
+            hightligthedEdge.line.setStroke(Color.BLACK);
+        }
+
+        if (hightligthedNode != null) {
+            hightligthedNode.setTextFill(Color.BLACK);
+        }
     }
 
     @Override

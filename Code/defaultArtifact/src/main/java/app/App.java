@@ -150,6 +150,8 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 AlgorithmMessage mes = algorithmSolver.stepForward();
                 logger.logEvent(logger.prepare(mes.getMessage()));
+                graphEditor.setCurrentEdge(mes.getViewingEdge());
+                graphEditor.setCurrentVertex(mes.getChangeV());
             }
         });
 
@@ -176,6 +178,7 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 logger.clear();
                 algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
+                graphEditor.rerunEditor();
             }
         });
 
