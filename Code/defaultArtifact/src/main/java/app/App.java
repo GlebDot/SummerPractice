@@ -15,6 +15,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import algorithm.*;
 import graphEditor.*;
 import graph.*;
@@ -144,7 +148,23 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logger.logEvent("Run full");
+                //Таймер
+                Timer runFullTimer = new Timer();
+
+                //Задача таймера, будет выполняться им через интевралы времени
+                TimerTask runFullTimerTask = new TimerTask(){
+                
+                    @Override
+                    public void run() {
+                        //тут нужен РЕАЛЬНЫЙ код
+                        System.out.println("Hello");
+                    }
+                };
+
+                //Установка задачи таймера так, чтобы она выполнялась каждую секунду
+                //Тут очень важно, что он устанавливается, но никогда не снимается
+                //Это означает что таймер будет работать вечно
+                runFullTimer.schedule(runFullTimerTask, 0, 1000);
             }
         });
 
