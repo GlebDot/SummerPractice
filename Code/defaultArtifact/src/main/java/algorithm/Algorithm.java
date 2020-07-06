@@ -32,7 +32,8 @@ public class Algorithm implements IAlgorithm {
         if(indexOuterLoop >= (graph.countOfVertex - 1)){
             isFinish = true;
             //На этом шаге сообщается, присутствует ли в графе цикл отрицательного веса (сделать одним циклом или по шагам?)
-            return new AlgorithmMessage("The algorithm has completed work"+answer()); // DONE
+            String mes = "The algorithm has completed work"+answer();
+            return new AlgorithmMessage(mes, null, true); // DONE
         }
         if(indexInnerLoop<allEdge.size()){
             Edge tmp = allEdge.get(indexInnerLoop);
@@ -41,16 +42,20 @@ public class Algorithm implements IAlgorithm {
                 if(tmp.end.isCheck == false){
                     tmp.end.isCheck = true;
                     tmp.end.distance = tmp.start.distance + tmp.weight;
-                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" from infinity: "+ tmp.end.distance);//changed distance from infinity
+                    String mes = "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" from infinity: "+ tmp.end.distance;
+                    return new AlgorithmMessage(mes, tmp, false);//changed distance from infinity
                 }
                 if ((tmp.end.distance > (tmp.start.distance + tmp.weight))) {
                     tmp.end.distance = tmp.start.distance + tmp.weight;
-                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" because found distance are less "+ tmp.end.distance);//end v distance changed because found distance are less
+                    String mes = "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" because found distance are less "+ tmp.end.distance;
+                    return new AlgorithmMessage(mes, tmp, false );//end v distance changed because found distance are less
                 }else{
-                    return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Nothing changed because found distance larger");// nothing changed because found distance larger
+                    String mes = "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Nothing changed because found distance larger";
+                    return new AlgorithmMessage(mes, tmp, false);// nothing changed because found distance larger
                 }
             }else{
-                return new AlgorithmMessage("Considered edge: "+tmp.start.name+"-"+tmp.end.name+"Nothing changed because start vertex has mark \"infinity\""); // nothing changed because startV "infinity"
+                String mes = "Considered edge: "+tmp.start.name+"-"+tmp.end.name+"Nothing changed because start vertex has mark \"infinity\"";
+                return new AlgorithmMessage(mes, tmp, false); // nothing changed because startV "infinity"
             }
         }else{
             indexOuterLoop++;
