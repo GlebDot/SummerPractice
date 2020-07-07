@@ -13,6 +13,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -78,6 +81,25 @@ public class App extends Application {
         loggerTable.setLayoutX(1000.0);
         loggerTable.setLayoutY(140.0);
         loggerTable.setBorder(defaultBorder);
+            loggerTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                ObservableList<String> stList = loggerTable.getItems();
+                StringBuilder outStr = new StringBuilder(stList.toString());
+                outStr.deleteCharAt(0);
+                outStr.deleteCharAt(outStr.length() - 1);
+                for(int i = 0; i < outStr.length(); i++){
+                    if(outStr.charAt(i) == ','){
+                        outStr.setCharAt(i, '\n');
+                        outStr.setCharAt(i+1, '\n');
+                    }
+                }
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent content = new ClipboardContent();
+                content.putString(outStr.toString());
+                clipboard.setContent(content);
+            }
+        });
 
         Pane graphEditorBox = new Pane();
         graphEditorBox.setBorder(defaultBorder);
@@ -158,7 +180,7 @@ public class App extends Application {
                     @Override public void handle(ActionEvent actionEvent) {
                         AlgorithmMessage mes = algorithmSolver.stepForward();
                         logger.logEvent(logger.prepare(mes.getMessage()));
-                        if(mes.getMessage().substring(0, 3).equals("The")){
+                        if(mes.getMessage().indexOf("Result") != -1){
                             timeline.stop();
                         }
                     }
