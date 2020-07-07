@@ -127,6 +127,7 @@ public class App extends Application {
                 reader = new fileReader(fileChooser.showOpenDialog(stage));
                 Graph g = reader.readFromFile();
                 if (g != null) {
+                    graphEditor.clearEditor();
                     graphEditor.loadGraph(g);
                 }
             }
@@ -154,6 +155,7 @@ public class App extends Application {
                     makeAlgStepButton.setVisible(true);
                     runFullAlgButton.setVisible(true);
                     reRunAlgButton.setVisible(true);
+
                     graphEditor.setEditState(false);
                     algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
                 }
@@ -189,6 +191,8 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
+                graphEditor.rerunEditor();
                 Timeline timeline = new Timeline();
                 timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent actionEvent) {

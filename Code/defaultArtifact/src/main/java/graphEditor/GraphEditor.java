@@ -482,6 +482,9 @@ public class GraphEditor implements IGraphEditor {
         for (EdgeVisual edge : graphEdges) {
             edge.textWeigth.setDisable(false);
         }
+
+        hightligthedEdge.line.setStroke(Color.BLACK);
+        hightligthedNode.setBorder(Border.EMPTY);
     }
 
     private void setEndStartNodesForEdge(Edge e) {
