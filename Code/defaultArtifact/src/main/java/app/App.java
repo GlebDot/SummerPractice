@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.util.concurrent.TimeUnit;
+import java.io.File;
 import java.io.FileReader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -125,12 +126,16 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Open Resource File");
-                reader = new fileReader(fileChooser.showOpenDialog(stage));
-                Graph g = reader.readFromFile();
-                if (g != null) {
-                    graphEditor.clearEditor();
-                    graphEditor.loadGraph(g);
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    reader = new fileReader(file);
+                    Graph g = reader.readFromFile();
+                    if (g != null) {
+                        graphEditor.clearEditor();
+                        graphEditor.loadGraph(g);
+                    }
                 }
+                
             }
         });
 
