@@ -461,7 +461,10 @@ public class GraphEditor implements IGraphEditor {
             node.setLabelRef(nodeLabel);
         }
 
-        startNode.setNewLabelValue("0");
+        if (startNode != null) {
+            startNode.setNewLabelValue("0");
+        }
+
 
         for (EdgeVisual edge : graphEdges) {
             edge.textWeigth.setDisable(true);
@@ -483,8 +486,13 @@ public class GraphEditor implements IGraphEditor {
             edge.textWeigth.setDisable(false);
         }
 
-        hightligthedEdge.line.setStroke(Color.BLACK);
-        hightligthedNode.setBorder(Border.EMPTY);
+        if (hightligthedEdge != null) {
+            hightligthedEdge.line.setStroke(Color.BLACK);
+        }
+
+        if (hightligthedNode != null) {
+            hightligthedNode.setBorder(Border.EMPTY);
+        }
     }
 
     private void setEndStartNodesForEdge(Edge e) {
@@ -538,12 +546,15 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void setCurrentVertex(Vertex v) {
-        if ((v == null && hightligthedNode != null) || hightligthedEdge == null) {
-            hightligthedNode.setBorder(Border.EMPTY);
-            hightligthedNode = null;
-
+        if (v == null) {
+            if (hightligthedNode != null) {
+                hightligthedNode.setBorder(Border.EMPTY);
+                hightligthedNode = null;
+            }
+            
             return;
         }
+
 
         if (hightligthedNode != null) {
             hightligthedNode.setBorder(Border.EMPTY);
@@ -593,7 +604,9 @@ public class GraphEditor implements IGraphEditor {
             node.setNewLabelValue("inf");
         }
 
-        startNode.setNewLabelValue("0");
+        if (startNode != null) {
+            startNode.setNewLabelValue("0");
+        }
     }
 
     @Override
