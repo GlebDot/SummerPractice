@@ -18,7 +18,7 @@ public class fileReader {
 
     public fileReader(File file) {
         this.file = file;
-        log.getInstance();
+        log = Logger.getInstance();
         scn = null;
     }
 
@@ -57,6 +57,7 @@ public class fileReader {
         if(scn.hasNext(patternForVertex)){
             verStart = scn.next().charAt(0);
             tmpStart = new Vertex(verStart.toString());
+            tmpStart.isStart = true;
             allVertex.put(verStart, tmpStart);
             gr.addVertex(tmpStart);
             log.logEvent("Start vertex for algorithm: "+verStart);

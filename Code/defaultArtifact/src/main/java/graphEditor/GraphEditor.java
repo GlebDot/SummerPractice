@@ -1,8 +1,6 @@
 package graphEditor;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 import graph.*;
 import javafx.beans.value.ChangeListener;
@@ -17,8 +15,6 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Label;
@@ -27,6 +23,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.util.*;
+import logger.AlgorithmMessage;
+import logger.ILogger;
+import logger.Logger;
 
 
 enum EdgeDrawingStates {DRAW_EDGE, NOT_DRAW_EDGE}
@@ -209,6 +208,11 @@ class NodeVisual extends Button {
         labelRef = label;
     }
 
+    public void setNewName(String name) {
+        setText(name);
+        nodeRef.name = name;
+    }
+
     public void setNewLabelValue(String info) {
         labelRef.setText(info);
         labelRef.setTextFill(Color.FIREBRICK);
@@ -266,6 +270,8 @@ public class GraphEditor implements IGraphEditor {
     private Border hightlightBorder;
     private Pane parentBox;
 
+    private ILogger logger;
+
 
     private ArrayList<NodeVisual> graphNodes;
     private ArrayList<Label> nodeLabels;
@@ -291,11 +297,13 @@ public class GraphEditor implements IGraphEditor {
         graphNodesCount = 0;
         edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
         graph = new Graph();
-        graphNodes = new ArrayList<NodeVisual>();
 
         nodeLabels = new ArrayList<Label>();
         graphNodes = new ArrayList<NodeVisual>();
         graphEdges = new ArrayList<EdgeVisual>();
+
+        logger = Logger.getInstance();
+
         //add Vertex
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -306,6 +314,8 @@ public class GraphEditor implements IGraphEditor {
                     graphNode.setLayoutY(event.getY());
                     parentBox.getChildren().add(graphNode);
                     graphNodes.add(graphNode);
+                
+                    logger.logEvent(new AlgorithmMessage("Created vertex: " + graphNode.getText()));
                     edgeState = EdgeDrawingStates.NOT_DRAW_EDGE;
 
                     if (graphNodes.size() == 1) {
@@ -323,7 +333,9 @@ public class GraphEditor implements IGraphEditor {
 
         startNode = node;
         graph.setStartVertex(startNode.getVertexRef());
-        startNode.setTextFill(Color.FIREBRICK);;
+        startNode.setTextFill(Color.FIREBRICK);
+
+        logger.logEvent(new AlgorithmMessage("New start vertex: " + startNode.getText()));
     }
 
     private NodeVisual createGraphNodeButton() {
@@ -355,9 +367,9 @@ public class GraphEditor implements IGraphEditor {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.SECONDARY) == 0 && isEditing) {
-                    System.out.println("Delete vertex: " + graphNode.getText());
                     graph.deleteVertex(graphNode.getVertexRef());
 
+                    logger.logEvent(new AlgorithmMessage("Deleted vertex: " + graphNode.getText()));
                     ArrayList<EdgeVisual> edgesToRemove = graphNode.getEdges();
                     for (EdgeVisual edge : edgesToRemove) {
                         parentBox.getChildren().remove(edge);
@@ -392,6 +404,8 @@ public class GraphEditor implements IGraphEditor {
         } else {
             edge = new EdgeVisual(start, end, false);
         }
+        logger.logEvent(new AlgorithmMessage("Created edge: " + start.getText() + " - " + 
+        end.getText()));
         
 
         graph.addEdge(edge.getEdgeRef());
@@ -402,6 +416,9 @@ public class GraphEditor implements IGraphEditor {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().compareTo(MouseButton.SECONDARY) == 0 && isEditing) {
+                    logger.logEvent(new AlgorithmMessage("Deleted edge: " + edge.source.getText() + " - " + 
+                    edge.finish.getText()));
+
                     graph.deleteEdge(edge.getEdgeRef());
                     parentBox.getChildren().remove(edge);
                     graphEdges.remove(edge);
@@ -500,6 +517,8 @@ public class GraphEditor implements IGraphEditor {
         if (e == null && hightligthedEdge != null) {
             hightligthedEdge.line.setStroke(Color.BLACK);
             hightligthedEdge = null;
+
+            return;
         }
 
         if (hightligthedEdge != null) {
@@ -516,15 +535,16 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void setCurrentVertex(Vertex v) {
-        if (v == null && hightligthedNode != null) {
+        if ((v == null && hightligthedNode != null) || hightligthedEdge == null) {
             hightligthedNode.setBorder(Border.EMPTY);
             hightligthedNode = null;
+
+            return;
         }
 
         if (hightligthedNode != null) {
             hightligthedNode.setBorder(Border.EMPTY);
         }
-        System.out.println("It's me Pario");
         for (NodeVisual node : graphNodes) {
             if (v.name == node.getVertexRef().name) {
                 hightligthedNode = node;
@@ -563,8 +583,14 @@ public class GraphEditor implements IGraphEditor {
         }
 
         if (hightligthedNode != null) {
-            hightligthedNode.setTextFill(Color.BLACK);
+            hightligthedNode.setBorder(Border.EMPTY);
         }
+
+        for (NodeVisual node : graphNodes) {
+            node.setNewLabelValue("inf");
+        }
+
+        startNode.setNewLabelValue("0");
     }
 
     @Override
@@ -579,8 +605,13 @@ public class GraphEditor implements IGraphEditor {
             NodeVisual graphNode = createGraphNodeButton();
             graphNode.setLayoutX(coordX);
             graphNode.setLayoutY(coordY);
+            graphNode.setNewName(vertex.name);
             parentBox.getChildren().add(graphNode);
             graphNodes.add(graphNode);
+
+            if (vertex.isStart) {
+                setStartVertex(graphNode);
+            }
 
             coordX += stepX;
             if (coordX > parentBox.getWidth() - 100) {
@@ -595,17 +626,7 @@ public class GraphEditor implements IGraphEditor {
                 EdgeVisual edgeVis = createEdge(edgeStart, edgeEnd);
                 edgeEnd.setEdge(edgeVis);
                 edgeStart.setEdge(edgeVis);
-                edgeEnd.setText(e.end.name);
-                edgeStart.setText(e.start.name);
                 parentBox.getChildren().add(edgeVis);
-
-                if (e.start.isStart) {
-                    setStartVertex(edgeStart);
-                }
-
-                if (e.end.isStart) {
-                    setStartVertex(edgeEnd);
-                }
                 
                 edgeVis.textWeigth.getValueFactory().setValue(e.weight);
             }

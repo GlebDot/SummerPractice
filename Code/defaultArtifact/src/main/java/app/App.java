@@ -21,12 +21,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.util.concurrent.TimeUnit;
+import java.io.FileReader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
 import algorithm.*;
+import fileReader.fileReader;
 import graphEditor.*;
 import graph.*;
 import javafx.util.Duration;
@@ -42,6 +44,7 @@ public class App extends Application {
 
     private Logger logger;
     private IAlgorithm algorithmSolver;
+    private fileReader reader;
 
     //Var GraphEditor
     //Vars...
@@ -121,7 +124,11 @@ public class App extends Application {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Open Resource File");
-                fileChooser.showOpenDialog(stage);
+                reader = new fileReader(fileChooser.showOpenDialog(stage));
+                Graph g = reader.readFromFile();
+                if (g != null) {
+                    graphEditor.loadGraph(g);
+                }
             }
         });
 
@@ -129,6 +136,7 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent event) {
                 logger.clear();
+                graphEditor.clearEditor();
                 logger.logEvent("Graph cleared");
             }
         });
@@ -170,7 +178,11 @@ public class App extends Application {
                 AlgorithmMessage mes = algorithmSolver.stepForward();
                 logger.logEvent(logger.prepare(mes.getMessage()));
                 graphEditor.setCurrentEdge(mes.getViewingEdge());
-                graphEditor.setCurrentVertex(mes.getChangeV());
+                if (mes.getViewingEdge() != null) {
+                    graphEditor.setCurrentVertex(mes.getViewingEdge().end);
+                } else {
+                    graphEditor.setCurrentVertex(null);
+                }
             }
         });
 
@@ -182,6 +194,13 @@ public class App extends Application {
                     @Override public void handle(ActionEvent actionEvent) {
                         AlgorithmMessage mes = algorithmSolver.stepForward();
                         logger.logEvent(logger.prepare(mes.getMessage()));
+                        graphEditor.setCurrentEdge(mes.getViewingEdge());
+                        if (mes.getViewingEdge() != null) {
+                            graphEditor.setCurrentVertex(mes.getViewingEdge().end);
+                        } else {
+                            graphEditor.setCurrentVertex(null);
+                        }
+
                         if(mes.getMessage().indexOf("Result") != -1){
                             timeline.stop();
                         }
