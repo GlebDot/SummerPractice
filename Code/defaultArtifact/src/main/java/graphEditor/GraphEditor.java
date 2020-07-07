@@ -23,7 +23,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Label;
 import javafx.scene.input.*;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.util.*;
@@ -102,11 +102,11 @@ class EdgeVisual extends Group {
     }
 
     private void drawLoop() {
-        double startX = source.getLayoutX() +  source.getBoundsInParent().getWidth() / 2.0;;
+        double startX = source.getLayoutX() +  source.getMaxWidth() / 2.0;;
         double startY = source.getLayoutY();
 
         double endX = source.getLayoutX();
-        double endY = source.getLayoutY() + source.getBoundsInParent().getHeight() / 2.0;;
+        double endY = source.getLayoutY() + source.getMaxHeight() / 2.0;;
 
         line.getElements().add(new MoveTo(startX, startY));
 
@@ -127,21 +127,21 @@ class EdgeVisual extends Group {
     }
 
     private void drawEdge(boolean isDouble) {
-        double startX = source.getLayoutX() + source.getBoundsInParent().getWidth() / 2.0;
-        double startY = source.getLayoutY() + source.getBoundsInParent().getHeight() / 2.0;
+        double startX = source.getLayoutX() + source.getMaxWidth() / 2.0;
+        double startY = source.getLayoutY() + source.getMaxHeight() / 2.0;
 
-        double endX = finish.getLayoutX() + finish.getBoundsInParent().getWidth() / 2.0;
-        double endY = finish.getLayoutY() + finish.getBoundsInParent().getHeight() / 2.0;        
+        double endX = finish.getLayoutX() + finish.getMaxWidth() / 2.0;
+        double endY = finish.getLayoutY() + finish.getMaxHeight() / 2.0;        
 
         double angle = Math.atan2((endY - startY), (endX - startX)); 
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
 
-        startX += (line.getStrokeWidth() + source.getBoundsInParent().getWidth()) / 2.0 * cos;
-        startY += (line.getStrokeWidth() + source.getBoundsInParent().getWidth()) / 2.0 * sin;
+        startX += (line.getStrokeWidth() + source.getMaxWidth()) / 2.0 * cos;
+        startY += (line.getStrokeWidth() + source.getMaxWidth()) / 2.0 * sin;
 
-        endX -= (line.getStrokeWidth() * 2 + source.getBoundsInParent().getWidth() / 2.0) * cos;
-        endY -= (line.getStrokeWidth() * 2 + source.getBoundsInParent().getWidth()) / 2.0 * sin;
+        endX -= (line.getStrokeWidth() * 2 + source.getMaxWidth() / 2.0) * cos;
+        endY -= (line.getStrokeWidth() * 2 + source.getMaxWidth()) / 2.0 * sin;
 
         angle -= Math.PI / 2;
         sin = Math.sin(angle);
@@ -175,10 +175,10 @@ class EdgeVisual extends Group {
 
         } else {
             double textOffset = 0.0;
-            if (source.getLayoutY() > finish.getLayoutY()) {
-                textOffset = 50;
+            if (source.getLayoutY() > finish.getLayoutY() || source.getLayoutX() > finish.getLayoutX()) {
+                textOffset = 10;
             } else {
-                textOffset = -50;
+                textOffset = -35;
             }
             double textStartX = Math.min(source.getLayoutX(), finish.getLayoutX());
             double textStartY = Math.min(source.getLayoutY(), finish.getLayoutY());
@@ -263,6 +263,7 @@ public class GraphEditor implements IGraphEditor {
     
     private Canvas canvas;
     private GraphicsContext context;
+    private Border hightlightBorder;
     private Pane parentBox;
 
 
@@ -281,6 +282,8 @@ public class GraphEditor implements IGraphEditor {
     private int graphNodesCount;
 
     public GraphEditor(Canvas canvas) {
+        hightlightBorder = new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID,
+        new CornerRadii(1), new BorderWidths(3)));
         isEditing = true;
         this.canvas = canvas;
         context = canvas.getGraphicsContext2D();
@@ -409,16 +412,6 @@ public class GraphEditor implements IGraphEditor {
         return edge;
     }
 
-    private void setStartNode(NodeVisual node) {
-        if (startNode != null) {
-            startNode.setTextFill(Color.BLACK);
-        }
-
-        startNode = node;
-        startNode.setTextFill(Color.FIREBRICK);
-        graph.setStartVertex(startNode.getVertexRef());
-    }
-
     private void edgeDrawBegin(NodeVisual clickedButton) {
         edgeStart = clickedButton;
     }
@@ -474,6 +467,18 @@ public class GraphEditor implements IGraphEditor {
         }
     }
 
+    private void setEndStartNodesForEdge(Edge e) {
+        for (NodeVisual node : graphNodes) {
+            if (e.start.name.equals(node.getVertexRef().name)) {
+                edgeStart = node;
+            }
+
+            if (e.end.name.equals(node.getVertexRef().name)) {
+                edgeEnd = node;
+            }
+        }
+    }
+
     @Override
     public void setEditState(boolean isEditState) {
         isEditing = isEditState;
@@ -492,7 +497,11 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void setCurrentEdge(Edge e) {
-        System.out.println("It's me Pario");
+        if (e == null && hightligthedEdge != null) {
+            hightligthedEdge.line.setStroke(Color.BLACK);
+            hightligthedEdge = null;
+        }
+
         if (hightligthedEdge != null) {
             hightligthedEdge.line.setStroke(Color.BLACK);
         }
@@ -507,14 +516,19 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void setCurrentVertex(Vertex v) {
+        if (v == null && hightligthedNode != null) {
+            hightligthedNode.setBorder(Border.EMPTY);
+            hightligthedNode = null;
+        }
+
         if (hightligthedNode != null) {
-            hightligthedNode.setTextFill(Color.BLACK);
+            hightligthedNode.setBorder(Border.EMPTY);
         }
         System.out.println("It's me Pario");
         for (NodeVisual node : graphNodes) {
             if (v.name == node.getVertexRef().name) {
                 hightligthedNode = node;
-                node.setTextFill(Color.GREEN);
+                node.setBorder(hightlightBorder);
 
                 if (v.isCheck) {
                     hightligthedNode.setNewLabelValue(new Integer(v.distance).toString());
@@ -526,8 +540,11 @@ public class GraphEditor implements IGraphEditor {
 
     @Override 
     public void clearEditor() {
+        graph = new Graph();
+        graphNodesCount = 0;
+        edgeStart = null;
+        edgeEnd = null;
         for (NodeVisual node : graphNodes) {
-            graph.deleteVertex(node.getVertexRef());
             parentBox.getChildren().remove(node);
         }
 
@@ -552,6 +569,46 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void loadGraph(Graph graph) {
+        double stepX = (parentBox.getWidth() - 100) / (graph.graph.size() / 2);
+        double stepY = (parentBox.getHeight() - 100) / (graph.graph.size() / 2);
 
+        double coordX = 50;
+        double coordY = 50;
+
+        for(Vertex vertex : graph.graph.keySet()) {
+            NodeVisual graphNode = createGraphNodeButton();
+            graphNode.setLayoutX(coordX);
+            graphNode.setLayoutY(coordY);
+            parentBox.getChildren().add(graphNode);
+            graphNodes.add(graphNode);
+
+            coordX += stepX;
+            if (coordX > parentBox.getWidth() - 100) {
+                coordX = 50;
+                coordY += stepY;
+            }
+        } 
+
+        for (ArrayList<Edge> edges : graph.graph.values()) {
+            for (Edge e : edges) {
+                setEndStartNodesForEdge(e);
+                EdgeVisual edgeVis = createEdge(edgeStart, edgeEnd);
+                edgeEnd.setEdge(edgeVis);
+                edgeStart.setEdge(edgeVis);
+                edgeEnd.setText(e.end.name);
+                edgeStart.setText(e.start.name);
+                parentBox.getChildren().add(edgeVis);
+
+                if (e.start.isStart) {
+                    setStartVertex(edgeStart);
+                }
+
+                if (e.end.isStart) {
+                    setStartVertex(edgeEnd);
+                }
+                
+                edgeVis.textWeigth.getValueFactory().setValue(e.weight);
+            }
+        }
     }
 }
