@@ -197,9 +197,14 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+
                 algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
                 graphEditor.rerunEditor();
                 Timeline timeline = new Timeline();
+                makeAlgStepButton.setDisable(true);
+                runFullAlgButton.setDisable(true);
+                reRunAlgButton.setDisable(true);
+                onWatchModeButton.setDisable(true);
                 timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent actionEvent) {
                         AlgorithmMessage mes = algorithmSolver.stepForward();
@@ -212,6 +217,10 @@ public class App extends Application {
                         }
 
                         if(mes.getMessage().indexOf("Result") != -1){
+                            makeAlgStepButton.setDisable(false);
+                            runFullAlgButton.setDisable(false);
+                            reRunAlgButton.setDisable(false);
+                            onWatchModeButton.setDisable(false);
                             timeline.stop();
                         }
                     }
