@@ -71,6 +71,7 @@ public class App extends Application {
         reRunAlgButton.setVisible(false);
         makeAlgStepButton.setVisible(false);
         runFullAlgButton.setVisible(false);
+        onWatchModeButton.setDisable(true);
 
         Label loggerLabel = new Label("Edit Logger:");
         loggerLabel.setPrefWidth(200);
@@ -117,7 +118,7 @@ public class App extends Application {
         
         graphEditorBox.getChildren().add(canvas);
         
-        graphEditor = new GraphEditor(canvas);
+        graphEditor = new GraphEditor(canvas, onWatchModeButton);
         //handlers
         fileEditButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override

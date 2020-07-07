@@ -271,6 +271,7 @@ public class GraphEditor implements IGraphEditor {
     private Pane parentBox;
 
     private ILogger logger;
+    private Button controlButtonRef;
 
 
     private ArrayList<NodeVisual> graphNodes;
@@ -287,7 +288,7 @@ public class GraphEditor implements IGraphEditor {
 
     private int graphNodesCount;
 
-    public GraphEditor(Canvas canvas) {
+    public GraphEditor(Canvas canvas, Button b) {
         hightlightBorder = new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID,
         new CornerRadii(1), new BorderWidths(3)));
         isEditing = true;
@@ -303,6 +304,8 @@ public class GraphEditor implements IGraphEditor {
         graphEdges = new ArrayList<EdgeVisual>();
 
         logger = Logger.getInstance();
+
+        controlButtonRef = b;
 
         //add Vertex
         this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
@@ -375,6 +378,9 @@ public class GraphEditor implements IGraphEditor {
                         parentBox.getChildren().remove(edge);
                         graphEdges.remove(edge);
                     }
+                    if (graphEdges.isEmpty()) {
+                        controlButtonRef.setDisable(true);
+                    }
                     graphNodes.remove(graphNode);
                     parentBox.getChildren().remove(graphNode);
                     if (graphNode.equals(startNode) && !graphNodes.isEmpty()) {
@@ -406,11 +412,14 @@ public class GraphEditor implements IGraphEditor {
         }
         logger.logEvent(new AlgorithmMessage("Created edge: " + start.getText() + " - " + 
         end.getText()));
-        
+    
 
         graph.addEdge(edge.getEdgeRef());
 
         graphEdges.add(edge);
+        if (controlButtonRef.isDisable()) {
+            controlButtonRef.setDisable(false);
+        }
         //Delete edge event
         edge.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -525,9 +534,11 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void setCurrentEdge(Edge e) {
-        if (e == null && hightligthedEdge != null) {
-            hightligthedEdge.line.setStroke(Color.BLACK);
-            hightligthedEdge = null;
+        if (e == null) {
+            if (hightligthedEdge != null) {
+                hightligthedEdge.line.setStroke(Color.BLACK);
+                hightligthedEdge = null;
+            }
 
             return;
         }
@@ -588,6 +599,7 @@ public class GraphEditor implements IGraphEditor {
 
         graphNodes.clear();
         graphEdges.clear();
+        controlButtonRef.setDisable(true);
     }
 
     @Override
