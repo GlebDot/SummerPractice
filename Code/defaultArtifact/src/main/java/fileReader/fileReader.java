@@ -25,14 +25,14 @@ public class fileReader {
     public Graph readFromFile() {
         String nameF = file.getName();
         if(!nameF.matches(".+\\.txt$")){
-            log.logEvent("Read file error: wrong file extension");
+            log.logEvent(log.prepare("Read file error: wrong file extension"));
             return null;
         }
         try{
             scn = new Scanner(file);
         }catch (IOException e){
             //mes for log
-            log.logEvent("Error open file! "+e.getMessage());
+            log.logEvent(log.prepare("Error open file! "+e.getMessage()));
             return null;
         }
         Graph gr = new Graph();
@@ -51,7 +51,7 @@ public class fileReader {
         if(scn.hasNextInt()){
             countEdge = scn.nextInt();
         }else{
-            log.logEvent("\n Read file error: wrong count of edge (not a number)");
+            log.logEvent(log.prepare("\nRead file error: wrong count of edge (not a number)"));
             return null;
         }
         if(scn.hasNext(patternForVertex)){
@@ -60,11 +60,11 @@ public class fileReader {
             tmpStart.isStart = true;
             allVertex.put(verStart, tmpStart);
             gr.addVertex(tmpStart);
-            log.logEvent("Start vertex for algorithm: "+verStart);
+            log.logEvent(log.prepare("Start vertex for algorithm: "+verStart));
 
         }
         else{
-            log.logEvent("Read file error: wrong start vertex name (not [a-z])");
+            log.logEvent(log.prepare("Read file error: wrong start vertex name (not [a-z])"));
             return null;
         }
 
@@ -74,7 +74,7 @@ public class fileReader {
             if(scn.hasNext(patternForVertex)){
                 verStart =  scn.next().charAt(0);
             }else{
-                log.logEvent("Read file error: read edge - wrong start vertex name (not [a-z]) in line №"+(i+3));
+                log.logEvent(log.prepare("Read file error: read edge - wrong start vertex name (not [a-z]) in line №"+(i+3)));
                 return null;
             }
             //reading end v
@@ -82,7 +82,7 @@ public class fileReader {
                 verEnd = scn.next().charAt(0);
             }
             else{
-                log.logEvent("Read file error:  read edge - wrong end vertex name (not [a-z]) in line №"+(i+3));
+                log.logEvent(log.prepare("Read file error:  read edge - wrong end vertex name (not [a-z]) in line №"+(i+3)));
                 return null;
             }
             //reading weight
@@ -90,19 +90,19 @@ public class fileReader {
                 weight = scn.nextInt();
             }
             else{
-                log.logEvent("Read file error:  read edge - wrong  weight (not a number) in line №"+(i+3));
+                log.logEvent(log.prepare("Read file error:  read edge - wrong  weight (not a number) in line №"+(i+3)));
                 return null;
             }
             //checking for next line
             if(!scn.hasNextLine()){
                 if((i+1) < countEdge){
-                    log.logEvent("Read file error: not enough data");
+                    log.logEvent(log.prepare("Read file error: not enough data"));
                     return null;
                 }
             }else{
                 //check for junk in end line
                 if(scn.nextLine().length() != 0){
-                    log.logEvent("Read file error:  read edge - Wrong end line №"+(i+3));
+                    log.logEvent(log.prepare("Read file error:  read edge - Wrong end line №"+(i+3)));
                     return null;
                 }
             }
@@ -123,11 +123,11 @@ public class fileReader {
                 gr.addVertex(tmpEnd);
             }
             gr.addEdge(new Edge(weight, tmpStart, tmpEnd));
-            log.logEvent("Add new edge:\n"+verStart+" "+verEnd+" "+weight+"\n");
+            log.logEvent(log.prepare("Add new edge:\n"+verStart+" "+verEnd+" "+weight+"\n"));
         }
 
         if(scn.hasNextLine()){
-            log.logEvent("Warning read file: the number of edges is less than the data in the file, only the right amount is read \n");
+            log.logEvent(log.prepare("Warning read file: the number of edges is less than the data in the file, only the right amount is read \n"));
         }
 
         scn.close();
