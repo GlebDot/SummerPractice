@@ -68,8 +68,10 @@ public class App extends Application {
         Button runFullAlgButton = setButtonConfiguration(700.0, 65.0, 70.0, 35.0, "Run full");
         Button reRunAlgButton = setButtonConfiguration(790.0, 65.0, 70.0, 35.0, "Re run");
         Button killRunButton = setButtonConfiguration(880.0, 65.0, 70.0, 35.0, "STOP");
-        Button runOneCycleButton = setButtonConfiguration(520.0, 65.0, 70.0, 35.0, "1 cycle");
+        Button runOneCycleButton = setButtonConfiguration(500.0, 65.0, 90.0, 35.0, "Run 1 cycle");
+        Button noAnimationsButton = setButtonConfiguration(410.0, 65.0, 70.0, 35.0, "1 cycle");
 
+        noAnimationsButton.setVisible(false);
         runOneCycleButton.setVisible(false);
         killRunButton.setStyle("-fx-background-color: #ff0000; ");
         killRunButton.setVisible(false);
@@ -160,6 +162,7 @@ public class App extends Application {
                     logger.logEvent("Algorithm steps:");
                     loggerLabel.setText("Algorithm Logger:");
                     fileEditButton.setDisable(true);
+                    noAnimationsButton.setVisible(true);
                     clearGraphButton.setDisable(true);
                     onWatchModeButton.setText("Back to edit");
                     makeAlgStepButton.setVisible(true);
@@ -181,6 +184,7 @@ public class App extends Application {
                     runFullAlgButton.setVisible(false);
                     runOneCycleButton.setVisible(false);
                     reRunAlgButton.setVisible(false);
+                    noAnimationsButton.setVisible(false);
                     graphEditor.setEditState(true);
                 }
             }
@@ -212,6 +216,7 @@ public class App extends Application {
                 reRunAlgButton.setDisable(true);
                 onWatchModeButton.setDisable(true);
                 killRunButton.setVisible(true);
+                noAnimationsButton.setDisable(true);
                 timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent actionEvent) {
                         AlgorithmMessage mes = algorithmSolver.stepForward();
@@ -229,6 +234,7 @@ public class App extends Application {
                             runOneCycleButton.setDisable(false);
                             onWatchModeButton.setDisable(false);
                             killRunButton.setVisible(false);
+                            noAnimationsButton.setDisable(false);
                             timeline.stop();
                         }
                     }
@@ -258,6 +264,7 @@ public class App extends Application {
                 onWatchModeButton.setDisable(false);
                 killRunButton.setVisible(false);
                 runOneCycleButton.setDisable(false);
+                noAnimationsButton.setDisable(false);
             }
         });
 
@@ -271,6 +278,7 @@ public class App extends Application {
                 reRunAlgButton.setDisable(true);
                 onWatchModeButton.setDisable(true);
                 killRunButton.setVisible(true);
+                noAnimationsButton.setDisable(true);
                 timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent actionEvent) {
                         AlgorithmMessage mes = algorithmSolver.stepForward();
@@ -289,6 +297,7 @@ public class App extends Application {
                             runOneCycleButton.setDisable(false);
                             onWatchModeButton.setDisable(false);
                             killRunButton.setVisible(false);
+                            noAnimationsButton.setDisable(false);
                             timeline.stop();
                         }
                     }
@@ -298,9 +307,23 @@ public class App extends Application {
             }
         });
 
+        noAnimationsButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                while(true){
+                    AlgorithmMessage mes = algorithmSolver.stepForward();
+                    logger.logEvent(logger.prepare(mes.getMessage()));
+                    graphEditor.setCurrentEdge(mes.getViewingEdge());
+                    if(mes.isEndOfCycle() || mes.getMessage().indexOf("The algorithm has already com") != -1){
+                        return;
+                    }
+                }
+            }
+        });
+
         Group root = new Group(loggerLabel, fileEditButton, clearGraphButton, onWatchModeButton,
                 makeAlgStepButton, runFullAlgButton, reRunAlgButton, graphEditorBox,
-                loggerTable, killRunButton, runOneCycleButton);
+                loggerTable, killRunButton, runOneCycleButton, noAnimationsButton);
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
