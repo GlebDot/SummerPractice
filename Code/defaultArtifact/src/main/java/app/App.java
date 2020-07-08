@@ -203,7 +203,6 @@ public class App extends Application {
         runFullAlgButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
                 algorithmSolver.initAlgorithm((Graph)graphEditor.getGraph());
                 graphEditor.rerunEditor();
                 timeline = new Timeline();
@@ -223,12 +222,11 @@ public class App extends Application {
                         } else {
                             graphEditor.setCurrentVertex(null);
                         }
-
-                        if(mes.getMessage().indexOf("Result") != -1){
+                        if(mes.isFinish()){
                             makeAlgStepButton.setDisable(false);
                             runFullAlgButton.setDisable(false);
                             reRunAlgButton.setDisable(false);
-                            runOneCycleButton.setDisable(true);
+                            runOneCycleButton.setDisable(false);
                             onWatchModeButton.setDisable(false);
                             killRunButton.setVisible(false);
                             timeline.stop();
@@ -259,13 +257,44 @@ public class App extends Application {
                 reRunAlgButton.setDisable(false);
                 onWatchModeButton.setDisable(false);
                 killRunButton.setVisible(false);
+                runOneCycleButton.setDisable(false);
             }
         });
 
         runOneCycleButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logger.logEvent("Vsem privet, ya pokuwal");
+                timeline = new Timeline();
+                makeAlgStepButton.setDisable(true);
+                runFullAlgButton.setDisable(true);
+                runOneCycleButton.setDisable(true);
+                reRunAlgButton.setDisable(true);
+                onWatchModeButton.setDisable(true);
+                killRunButton.setVisible(true);
+                timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent actionEvent) {
+                        AlgorithmMessage mes = algorithmSolver.stepForward();
+                        logger.logEvent(logger.prepare(mes.getMessage()));
+                        graphEditor.setCurrentEdge(mes.getViewingEdge());
+                        if (mes.getViewingEdge() != null) {
+                            graphEditor.setCurrentVertex(mes.getViewingEdge().end);
+                        } else {
+                            graphEditor.setCurrentVertex(null);
+                        }
+
+                        if(mes.isEndOfCycle() || mes.getMessage().indexOf("The algorithm has already com") != -1){
+                            makeAlgStepButton.setDisable(false);
+                            runFullAlgButton.setDisable(false);
+                            reRunAlgButton.setDisable(false);
+                            runOneCycleButton.setDisable(false);
+                            onWatchModeButton.setDisable(false);
+                            killRunButton.setVisible(false);
+                            timeline.stop();
+                        }
+                    }
+                }));
+                timeline.setCycleCount(Timeline.INDEFINITE);
+                timeline.play();
             }
         });
 
