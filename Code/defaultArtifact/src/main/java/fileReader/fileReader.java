@@ -46,7 +46,7 @@ public class fileReader {
         int weight = 0;
         int countEdge = 0;
 
-        String patternForVertex = "[a-z]";
+        String patternForVertex = "[a-zA-Z]";
 
         if(scn.hasNextInt()){
             countEdge = scn.nextInt();
