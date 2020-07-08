@@ -12,6 +12,7 @@ public class AlgorithmMessage {
     private Vertex changeV;
     private Vertex startV;
     private boolean isFinish;
+    private boolean isEndOfCycle;
 
     public AlgorithmMessage(){
         message = null;
@@ -19,6 +20,7 @@ public class AlgorithmMessage {
         changeV = null;
         startV = null;
         isFinish = false;
+        isEndOfCycle = false;
     }
 
     public AlgorithmMessage(String mes) {
@@ -27,9 +29,10 @@ public class AlgorithmMessage {
         changeV = null;
         startV = null;
         isFinish = false;
+        isEndOfCycle = false;
     }
 
-    public AlgorithmMessage(String mes, Edge viewingEdge, boolean isFinish) {
+    public AlgorithmMessage(String mes, Edge viewingEdge, boolean isFinish, boolean isEndOfCycle) {
         message = mes;
         this.viewingEdge = viewingEdge;
         if(viewingEdge!= null) {
@@ -41,7 +44,7 @@ public class AlgorithmMessage {
             this.startV = null;
         }
         this.isFinish = isFinish;
-
+        this.isEndOfCycle = isEndOfCycle;
     }
 
     public String getMessage() {
@@ -68,4 +71,7 @@ public class AlgorithmMessage {
         return this.isFinish;
     }
 
+    public boolean isEndOfCycle() {
+        return this.isEndOfCycle;
+    }
 }

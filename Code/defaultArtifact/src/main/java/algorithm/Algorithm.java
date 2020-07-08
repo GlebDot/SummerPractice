@@ -13,6 +13,7 @@ public class Algorithm implements IAlgorithm {
     protected Graph graph;
     protected int indexOuterLoop;
     protected int indexInnerLoop;
+    protected int cycleChangeCounter;
     protected ArrayList<Edge> allEdge;
     public boolean isFinish;
 
@@ -20,6 +21,7 @@ public class Algorithm implements IAlgorithm {
         graph = null;
         indexOuterLoop = 0;
         indexInnerLoop = 0;
+        cycleChangeCounter = 0;
         allEdge = new ArrayList<>();
         isFinish = false;
     }
@@ -35,7 +37,6 @@ public class Algorithm implements IAlgorithm {
         }
         if(indexOuterLoop >= (graph.countOfVertex - 1)){
             isFinish = true;
-
             mes += "The cycle has been passed Vertex - 1 times. Checking for negative weight cycle in graph... \n";
             boolean check = false;
             for(Edge tmp: allEdge){
@@ -51,33 +52,42 @@ public class Algorithm implements IAlgorithm {
             }
             mes = mes+ "The algorithm has completed work."+answer();
 
-            return new AlgorithmMessage(mes, null, true); // DONE
+            return new AlgorithmMessage(mes, null, true, true); // DONE
         }
         if(indexInnerLoop<allEdge.size()){
             Edge tmp = allEdge.get(indexInnerLoop);
             indexInnerLoop++;
+            boolean isEndOfCycle = (indexInnerLoop == allEdge.size())?true:false;
             if(tmp.start.isCheck == true) {
                 if(tmp.end.isCheck == false){
                     tmp.end.isCheck = true;
                     tmp.end.distance = tmp.start.distance + tmp.weight;
+                    cycleChangeCounter++;
                     mes = mes + "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" from infinity: "+ tmp.end.distance;
-                    return new AlgorithmMessage(mes, tmp, false);//changed distance from infinity
+                    return new AlgorithmMessage(mes, tmp, false,isEndOfCycle );//changed distance from infinity
                 }
                 if ((tmp.end.distance > (tmp.start.distance + tmp.weight))) {
                     tmp.end.distance = tmp.start.distance + tmp.weight;
+                    cycleChangeCounter++;
                     mes = mes + "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Changed distance for vertex "+ tmp.end.name+" because found distance are less "+ tmp.end.distance;
-                    return new AlgorithmMessage(mes, tmp, false );//end v distance changed because found distance are less
+                    return new AlgorithmMessage(mes, tmp, false, isEndOfCycle);//end v distance changed because found distance are less
                 }else{
                     mes = mes +  "Considered edge: "+tmp.start.name+"-"+tmp.end.name+". Nothing changed because found distance larger";
-                    return new AlgorithmMessage(mes, tmp, false);// nothing changed because found distance larger
+                    return new AlgorithmMessage(mes, tmp, false, isEndOfCycle);// nothing changed because found distance larger
                 }
             }else{
                 mes = mes +  "Considered edge: "+tmp.start.name+"-"+tmp.end.name+"Nothing changed because start vertex has mark \"infinity\"";
-                return new AlgorithmMessage(mes, tmp, false); // nothing changed because startV "infinity"
+                return new AlgorithmMessage(mes, tmp, false, isEndOfCycle); // nothing changed because startV "infinity"
             }
         }else{
             indexOuterLoop++;
             indexInnerLoop = 0;
+            if(cycleChangeCounter == 0){
+                isFinish = true;
+                mes += "The algorithm has completed work because nothing has changed on the current cycle, also it's mean that there isn't a negative weight cycle. \n"+answer();
+                return new AlgorithmMessage(mes, null, true, true);
+            }
+            cycleChangeCounter = 0;
             return stepForward();
         }
     }
@@ -121,7 +131,8 @@ public class Algorithm implements IAlgorithm {
         Arrays.sort(allVertexNew);
         String ans = "\nResult: \n Start vertex: " + graph.startVertex.name+"\n";
         for(Vertex v: allVertexNew){
-            ans= ans + "Vertex: " + v.name + " distance " + v.distance + "\n";
+            boolean isInf = v.isCheck;
+            ans= ans + "Vertex: " + v.name + " distance " +(isInf?v.distance:"inf") + "\n";
 
         }
         return ans;
