@@ -2,7 +2,6 @@ package graph;
 
 /**class for storing information about vertex of the graph */
 public class Vertex implements Comparable<Vertex> {
-    Graph h;
     public int number;
     public int distance;
     public boolean isStart;
