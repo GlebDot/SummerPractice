@@ -678,8 +678,8 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void loadGraph(Graph graph) {
-        double stepX = (parentBox.getWidth() - 150) / (graph.graph.size() / 2);
-        double stepY = (parentBox.getHeight() - 150) / (graph.graph.size() / 2);
+        double stepX = (parentBox.getWidth() - 150) / Math.ceil(graph.graph.size() * 1.0 / 2);
+        double stepY = (parentBox.getHeight() - 150) / Math.ceil(graph.graph.size() * 1.0 / 2);
 
         double coordX = 50;
         double coordY = 50;
@@ -712,6 +712,8 @@ public class GraphEditor implements IGraphEditor {
                 xOrder = 0;
                 if (yOrder % 2 == 0) {
                     coordX = 75;
+                } else {
+                    coordX = 50;
                 }
             }
         } 
