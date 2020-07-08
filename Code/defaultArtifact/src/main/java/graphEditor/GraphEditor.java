@@ -17,7 +17,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.Label;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -42,6 +41,8 @@ class EdgeVisual extends Group {
     protected Button source;
     protected Button finish;
     protected Edge edgeRef;
+
+    private Border selectBorder;
 
     public Edge getEdgeRef() {
         return edgeRef;
@@ -72,6 +73,9 @@ class EdgeVisual extends Group {
 
         edgeRef = new Edge(0, start.getVertexRef(), end.getVertexRef());
 
+        selectBorder = new Border(new BorderStroke(Color.YELLOW, BorderStrokeStyle.SOLID,
+        new CornerRadii(1), new BorderWidths(2)));
+
         line = new Path();
         edgeWeigthLabel = new Text("0");
         edgeWeigthLabel.setFont(Font.font("Colibri", FontWeight.SEMI_BOLD, 14));
@@ -90,6 +94,11 @@ class EdgeVisual extends Group {
         line.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
+                toFront();
+                if (!textWeigth.isDisable()){
+                    line.setStroke(Color.YELLOW);
+                }
+                textWeigth.setBorder(selectBorder);
                 edgeWeigthLabel.setLayoutX(event.getX());
                 edgeWeigthLabel.setLayoutY(event.getY() - 14);
 
@@ -100,6 +109,10 @@ class EdgeVisual extends Group {
         line.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>(){
             @Override
             public void handle(MouseEvent event) {
+                if (!textWeigth.isDisable()){
+                    line.setStroke(Color.BLACK);
+                }
+                textWeigth.setBorder(Border.EMPTY);
                 edgeWeigthLabel.setVisible(false);
             }
         });
@@ -665,16 +678,24 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void loadGraph(Graph graph) {
-        double stepX = (parentBox.getWidth() - 100) / (graph.graph.size() / 2);
-        double stepY = (parentBox.getHeight() - 100) / (graph.graph.size() / 2);
+        double stepX = (parentBox.getWidth() - 150) / (graph.graph.size() / 2);
+        double stepY = (parentBox.getHeight() - 150) / (graph.graph.size() / 2);
 
         double coordX = 50;
         double coordY = 50;
 
+        int xOrder = 0;
+        int yOrder = 0;
+
         for(Vertex vertex : graph.graph.keySet()) {
             NodeVisual graphNode = createGraphNodeButton();
             graphNode.setLayoutX(coordX);
-            graphNode.setLayoutY(coordY);
+
+            if (xOrder % 2 == 0) {
+                graphNode.setLayoutY(coordY);
+            } else {
+                graphNode.setLayoutY(coordY + 50);
+            }
             graphNode.setNewName(vertex.name);
             parentBox.getChildren().add(graphNode);
             graphNodes.add(graphNode);
@@ -684,9 +705,14 @@ public class GraphEditor implements IGraphEditor {
             }
 
             coordX += stepX;
-            if (coordX > parentBox.getWidth() - 100) {
-                coordX = 50;
+            xOrder++;
+            if (coordX > parentBox.getWidth() - stepX) {
                 coordY += stepY;
+                yOrder++;
+                xOrder = 0;
+                if (yOrder % 2 == 0) {
+                    coordX = 75;
+                }
             }
         } 
 
