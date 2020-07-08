@@ -38,15 +38,17 @@ public class Algorithm implements IAlgorithm {
         if(indexOuterLoop >= (graph.countOfVertex - 1)){
             isFinish = true;
             mes += "The cycle has been passed Vertex - 1 times. Checking for negative weight cycle in graph... \n";
+            String forNegC ="";
             boolean check = false;
             for(Edge tmp: allEdge){
                 if (tmp.end.distance > (tmp.start.distance + tmp.weight)){
                     check = true;
+                    forNegC = findNegativeCycle();
                     break;
                 }
             }
             if(check){
-                mes+="There is a negative weight cycle \n";
+                mes+="There is a negative weight cycle \n"+forNegC;
             }else{
                 mes+="There isn't a negative weight cycle \n";
             }
@@ -136,5 +138,43 @@ public class Algorithm implements IAlgorithm {
 
         }
         return ans;
+    }
+
+    public String findNegativeCycle(){
+        ArrayList<Edge> ed = new ArrayList<>();
+        for(int i = 0; i < graph.countOfVertex - 1; i++){
+            for(Edge tmp: allEdge){
+                if(tmp.start.isCheck) {
+                    if (tmp.end.distance > (tmp.start.distance + tmp.weight)) {
+                        tmp.end.distance = tmp.start.distance + tmp.weight;
+                        if (!ed.contains(tmp)) {
+                            ed.add(tmp);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        String res= "";
+        if(ed.size() != 0){
+            res+="Edge in cycle:\n";
+            Edge Start = ed.get(0);
+            Edge tmp = Start;
+            Edge tmp2 = Start;
+            res+= tmp.start.name+"-"+tmp.end.name +"\n";
+            int count = 1;
+            while (count != ed.size()) {
+                for (int i = 0; i < ed.size(); i++) {
+                    tmp2 = ed.get(i);
+                    if (tmp.end.name == tmp2.start.name) {
+                        tmp = tmp2;
+                        res += tmp.start.name + "-" + tmp.end.name + "\n";
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        return res ;
     }
 }
