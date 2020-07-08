@@ -314,6 +314,7 @@ public class App extends Application {
                     AlgorithmMessage mes = algorithmSolver.stepForward();
                     logger.logEvent(logger.prepare(mes.getMessage()));
                     graphEditor.setCurrentEdge(mes.getViewingEdge());
+                    graphEditor.setCurrentVertex(mes.getChangeV());
                     if(mes.isEndOfCycle() || mes.getMessage().indexOf("The algorithm has already com") != -1){
                         return;
                     }
