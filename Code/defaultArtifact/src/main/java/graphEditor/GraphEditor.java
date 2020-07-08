@@ -22,6 +22,9 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.util.*;
 import logger.AlgorithmMessage;
 import logger.ILogger;
@@ -33,10 +36,13 @@ enum EdgeDrawingStates {DRAW_EDGE, NOT_DRAW_EDGE}
 class EdgeVisual extends Group {
     Path line;
     Spinner<Integer> textWeigth;
+    Text edgeWeigthLabel;
 
     protected Button source;
     protected Button finish;
     protected Edge edgeRef;
+
+    private Border selectBorder;
 
     public Edge getEdgeRef() {
         return edgeRef;
@@ -67,7 +73,14 @@ class EdgeVisual extends Group {
 
         edgeRef = new Edge(0, start.getVertexRef(), end.getVertexRef());
 
+        selectBorder = new Border(new BorderStroke(Color.YELLOW, BorderStrokeStyle.SOLID,
+        new CornerRadii(1), new BorderWidths(2)));
+
         line = new Path();
+        edgeWeigthLabel = new Text("0");
+        edgeWeigthLabel.setFont(Font.font("Colibri", FontWeight.SEMI_BOLD, 14));
+        //edgeWeigthLabel.setPrefSize(50, 50);
+        edgeWeigthLabel.setVisible(false);
         line.setStrokeWidth(3);
         textWeigth = new Spinner<Integer>();
 
@@ -77,6 +90,32 @@ class EdgeVisual extends Group {
 
         line.setStroke(Color.BLACK);
         line.setFill(Color.TRANSPARENT);
+
+        line.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>(){
+            @Override
+            public void handle(MouseEvent event) {
+                toFront();
+                if (!textWeigth.isDisable()){
+                    line.setStroke(Color.YELLOW);
+                }
+                textWeigth.setBorder(selectBorder);
+                edgeWeigthLabel.setLayoutX(event.getX());
+                edgeWeigthLabel.setLayoutY(event.getY() - 14);
+
+                edgeWeigthLabel.setVisible(true);
+            }
+        });
+
+        line.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>(){
+            @Override
+            public void handle(MouseEvent event) {
+                if (!textWeigth.isDisable()){
+                    line.setStroke(Color.BLACK);
+                }
+                textWeigth.setBorder(Border.EMPTY);
+                edgeWeigthLabel.setVisible(false);
+            }
+        });
 
         if (source.getLayoutX() == finish.getLayoutX() && finish.getLayoutY() == source.getLayoutY()) {
             drawLoop();
@@ -91,11 +130,17 @@ class EdgeVisual extends Group {
             @Override
             public void changed(ObservableValue<? extends Integer> value, Integer oldValue, Integer newValue) {
                 edgeRef.changeWeight(newValue);
+                edgeWeigthLabel.setText(newValue.toString());
             }
         });
 
         setWeigthTextPosition();
 
+        textWeigth.toFront();
+        line.toBack();
+
+
+        getChildren().add(edgeWeigthLabel);
         getChildren().add(line);
         getChildren().add(textWeigth);
     }
@@ -173,17 +218,18 @@ class EdgeVisual extends Group {
             textY = source.getLayoutY() - 60;
 
         } else {
-            double textOffset = 0.0;
-            if (source.getLayoutY() > finish.getLayoutY() || source.getLayoutX() > finish.getLayoutX()) {
-                textOffset = 10;
-            } else {
-                textOffset = -35;
-            }
-            double textStartX = Math.min(source.getLayoutX(), finish.getLayoutX());
-            double textStartY = Math.min(source.getLayoutY(), finish.getLayoutY());
+
+            double angle = Math.atan2((finish.getLayoutY() - source.getLayoutY()), 
+            (finish.getLayoutX() - source.getLayoutX()));
+
+            double sin = Math.sin(angle);
+            double cos = Math.cos(angle);
+
+            double textStartX = source.getLayoutX();
+            double textStartY = source.getLayoutY();
     
-            textX = Math.abs(source.getLayoutX() - finish.getLayoutX()) / 2.0 + textStartX + textOffset;
-            textY = Math.abs(source.getLayoutY() - finish.getLayoutY()) / 2.0 + textStartY + textOffset;
+            textX = Math.abs(source.getLayoutX() - finish.getLayoutX()) * 2.0 / 5.0 * cos + textStartX;
+            textY = Math.abs(source.getLayoutY() - finish.getLayoutY()) * 2.0 / 5.0 * sin + textStartY;
         }
 
 
@@ -213,17 +259,24 @@ class NodeVisual extends Button {
         nodeRef.name = name;
     }
 
-    public void setNewLabelValue(String info) {
-        labelRef.setText(info);
-        labelRef.setTextFill(Color.FIREBRICK);
+    public Label getLabelRef() {
+        return labelRef;
+    }
 
-        final Timeline timeline = new Timeline();
-        timeline.setCycleCount(1);
-        timeline.setAutoReverse(false);
-        final KeyValue kv = new KeyValue(labelRef.textFillProperty(), Color.BLACK, Interpolator.EASE_BOTH);
-        final KeyFrame kf = new KeyFrame(Duration.millis(1500), kv);
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
+    public void setNewLabelValue(String info) {
+        labelRef.setTextFill(Color.FIREBRICK);
+        
+        if (info.equals(labelRef.getText())) {
+            final Timeline timeline = new Timeline();
+            timeline.setCycleCount(1);
+            timeline.setAutoReverse(false);
+            final KeyValue kv = new KeyValue(labelRef.textFillProperty(), Color.BLACK, Interpolator.EASE_BOTH);
+            final KeyFrame kf = new KeyFrame(Duration.millis(1500), kv);
+            timeline.getKeyFrames().add(kf);
+            timeline.play();
+        } else {
+            labelRef.setText(info);
+        }
     }
 
     public NodeVisual(String name) {
@@ -560,6 +613,7 @@ public class GraphEditor implements IGraphEditor {
         if (v == null) {
             if (hightligthedNode != null) {
                 hightligthedNode.setBorder(Border.EMPTY);
+                hightligthedNode.getLabelRef().setTextFill(Color.BLACK);
                 hightligthedNode = null;
             }
             
@@ -568,6 +622,7 @@ public class GraphEditor implements IGraphEditor {
 
 
         if (hightligthedNode != null) {
+            hightligthedNode.getLabelRef().setTextFill(Color.BLACK);
             hightligthedNode.setBorder(Border.EMPTY);
         }
         for (NodeVisual node : graphNodes) {
@@ -623,16 +678,24 @@ public class GraphEditor implements IGraphEditor {
 
     @Override
     public void loadGraph(Graph graph) {
-        double stepX = (parentBox.getWidth() - 100) / (graph.graph.size() / 2);
-        double stepY = (parentBox.getHeight() - 100) / (graph.graph.size() / 2);
+        double stepX = (parentBox.getWidth() - 150) / (graph.graph.size() / 2);
+        double stepY = (parentBox.getHeight() - 150) / (graph.graph.size() / 2);
 
         double coordX = 50;
         double coordY = 50;
 
+        int xOrder = 0;
+        int yOrder = 0;
+
         for(Vertex vertex : graph.graph.keySet()) {
             NodeVisual graphNode = createGraphNodeButton();
             graphNode.setLayoutX(coordX);
-            graphNode.setLayoutY(coordY);
+
+            if (xOrder % 2 == 0) {
+                graphNode.setLayoutY(coordY);
+            } else {
+                graphNode.setLayoutY(coordY + 50);
+            }
             graphNode.setNewName(vertex.name);
             parentBox.getChildren().add(graphNode);
             graphNodes.add(graphNode);
@@ -642,9 +705,14 @@ public class GraphEditor implements IGraphEditor {
             }
 
             coordX += stepX;
-            if (coordX > parentBox.getWidth() - 100) {
-                coordX = 50;
+            xOrder++;
+            if (coordX > parentBox.getWidth() - stepX) {
                 coordY += stepY;
+                yOrder++;
+                xOrder = 0;
+                if (yOrder % 2 == 0) {
+                    coordX = 75;
+                }
             }
         } 
 
