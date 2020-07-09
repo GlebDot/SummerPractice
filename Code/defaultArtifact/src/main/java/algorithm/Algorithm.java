@@ -43,7 +43,7 @@ public class Algorithm implements IAlgorithm {
             for(Edge tmp: allEdge){
                 if (tmp.end.distance > (tmp.start.distance + tmp.weight)){
                     check = true;
-                    forNegC = findNegativeCycle();
+                    forNegC = findNegative();
                     break;
                 }
             }
@@ -140,41 +140,63 @@ public class Algorithm implements IAlgorithm {
         return ans;
     }
 
-    public String findNegativeCycle(){
-        ArrayList<Edge> ed = new ArrayList<>();
-        for(int i = 0; i < graph.countOfVertex - 1; i++){
-            for(Edge tmp: allEdge){
-                if(tmp.start.isCheck) {
-                    if (tmp.end.distance > (tmp.start.distance + tmp.weight)) {
-                        tmp.end.distance = tmp.start.distance + tmp.weight;
-                        if (!ed.contains(tmp)) {
-                            ed.add(tmp);
-                        }
+    protected String findNegative(){
+        ArrayList<String> cycles;
+        ArrayList<Edge> allE = new ArrayList<>(allEdge);
+        ArrayList<String> cycleList = new ArrayList<>();
+        for(;;) {
+            Vertex vertexInCycle = null;
+            Edge toParent = null;
+            for (Edge tmp : allE) {
+                if (tmp.end.distance > (tmp.start.distance + tmp.weight)) {
+                    vertexInCycle = tmp.end;
+                    toParent = tmp;
+                    break;
+                }
+            }
+            if(vertexInCycle == null){
+                break;
+            }
+            if(graph.graph.get(vertexInCycle).size() == 0){
+                allE.remove(toParent);
+                continue;
+            }
+            String res = toParent.start.name+"-"+toParent.end.name+"\n";
+            ArrayList<Edge> edgesForRestore = new ArrayList<>();
+            edgesForRestore.add(toParent);
+            allE.remove(toParent);
+            int isFound = 0;
+            while(vertexInCycle != toParent.start){
+                if(allE.size() == 0){
+                    break;
+                }
+                for(Edge tmp: allE){
+                    isFound = 0;
+                    if(tmp.end == toParent.start){
+                        toParent = tmp;
+                        res+=toParent.start.name+"-"+toParent.end.name+"\n";
+                        allE.remove(tmp);
+                        edgesForRestore.add(tmp);
+                        isFound++;
                         break;
                     }
                 }
-            }
-        }
-        String res= "";
-        if(ed.size() != 0){
-            res+="Edge in cycle:\n";
-            Edge Start = ed.get(0);
-            Edge tmp = Start;
-            Edge tmp2 = Start;
-            res+= tmp.start.name+"-"+tmp.end.name +"\n";
-            int count = 1;
-            while (count != ed.size()) {
-                for (int i = 0; i < ed.size(); i++) {
-                    tmp2 = ed.get(i);
-                    if (tmp.end.name == tmp2.start.name) {
-                        tmp = tmp2;
-                        res += tmp.start.name + "-" + tmp.end.name + "\n";
-                        count++;
-                        break;
-                    }
+                if(isFound == 0){
+                    res = "";
+                    edgesForRestore.remove(edgesForRestore.size()-1);
+                    allE.addAll(edgesForRestore);
+                    edgesForRestore.clear();
+                    break;
                 }
             }
+            if(isFound!=0){
+                cycleList.add(res);
+            }
         }
-        return res ;
+        String res = "";
+        for(int i = 0; i<cycleList.size(); i++){
+            res +=cycleList.get(i);
+        }
+        return res;
     }
 }
