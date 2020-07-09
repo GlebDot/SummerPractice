@@ -710,7 +710,7 @@ public class GraphEditor implements IGraphEditor {
                 coordY += stepY;
                 yOrder++;
                 xOrder = 0;
-                if (yOrder % 2 == 0) {
+                if (yOrder % 2 == 1) {
                     coordX = 75;
                 } else {
                     coordX = 50;
